@@ -1,0 +1,149 @@
+.datePickerContainer {
+    position: relative;
+    width: 100%;
+}
+
+.inputWrapper {
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+}
+
+.dateInput {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    padding-right: 2.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid #e2e8f0;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.2s;
+    background: white;
+    line-height: 1.5;
+    color: #0f172a;
+    cursor: pointer;
+}
+
+.placeholder {
+    color: #94a3b8;
+}
+
+.dateInput:hover {
+    border-color: #2563eb;
+}
+
+.calendarIcon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+}
+
+/* ================= CALENDAR POPUP ================= */
+.calendarPopup {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 0.5rem;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 1.25rem;
+    z-index: 100;
+    width: 320px;
+    border: 1px solid #e2e8f0;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.navBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    color: #64748b;
+    transition: all 0.2s;
+}
+
+.navBtn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.currentMonth {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 1rem;
+}
+
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    text-align: center;
+}
+
+.dayName {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #94a3b8;
+    padding-bottom: 0.5rem;
+}
+
+.dayBtn {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dayBtn:hover {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.selected {
+    background: #2563eb !important;
+    color: white !important;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+
+.today {
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.empty {
+    pointer-events: none;
+}

@@ -1,0 +1,25 @@
+{
+  "name": "event_automation",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.33.0",
+    "lottie-react": "^2.4.1",
+    "lucide-react": "^0.562.0",
+    "next": "16.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.5.0",
+    "sass": "^1.97.2"
+  },
+  "devDependencies": {
+    "babel-plugin-react-compiler": "1.0.0"
+  }
+}
