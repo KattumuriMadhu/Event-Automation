@@ -42,3 +42,6 @@ yarn-error.log*
 
 # Secrets
 backend/keys/keys.js
+
+# Uploads
+backend/uploads/
