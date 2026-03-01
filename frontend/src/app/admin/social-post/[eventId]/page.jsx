@@ -270,11 +270,21 @@ export default function AdminSocialPostPage() {
         successes.forEach(s => {
           if (s.platform === 'instagram') {
             if (!updatedEvent.socialMedia.instagram) updatedEvent.socialMedia.instagram = {};
-            updatedEvent.socialMedia.instagram.posted = true;
+            if (mode === "SCHEDULE") {
+              updatedEvent.socialMedia.instagram.status = "SCHEDULED";
+            } else {
+              updatedEvent.socialMedia.instagram.posted = true;
+              updatedEvent.socialMedia.instagram.status = "POSTED";
+            }
           }
           if (s.platform === 'facebook') {
             if (!updatedEvent.socialMedia.facebook) updatedEvent.socialMedia.facebook = {};
-            updatedEvent.socialMedia.facebook.posted = true;
+            if (mode === "SCHEDULE") {
+              updatedEvent.socialMedia.facebook.status = "SCHEDULED";
+            } else {
+              updatedEvent.socialMedia.facebook.posted = true;
+              updatedEvent.socialMedia.facebook.status = "POSTED";
+            }
           }
         });
         setEvent(updatedEvent);
@@ -459,20 +469,19 @@ export default function AdminSocialPostPage() {
           </section>
         )}
 
-        {/* ================= SUCCESS INLINE ================= */}
         {showSuccess && (
           <div className={styles.inlineSuccess}>
             <div className={styles.inlineSuccessCard}>
               <div className={styles.icon}>✔</div>
               <div>
-                <h3>Event Published Successfully</h3>
+                <h3>{mode === "SCHEDULE" ? "Event Scheduled Successfully" : "Event Published Successfully"}</h3>
                 <p className={styles.successMeta}>
                   <strong>{event.title}</strong>
                 </p>
                 <p className={styles.successSub}>
                   {selectedPlatforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(" & ")} • {new Date().toLocaleString()}
                 </p>
-                <span className={styles.badge}>PUBLISHED</span>
+                <span className={styles.badge}>{mode === "SCHEDULE" ? "SCHEDULED" : "PUBLISHED"}</span>
                 <p className={styles.redirectText}>
                   This page will close automatically…
                 </p>

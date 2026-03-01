@@ -3,9 +3,10 @@ import Event from "../models/Event.js";
 import { postToInstagram } from "../services/postToInstagram.js";
 import { postToFacebook } from "../services/postToFacebook.js";
 
-cron.schedule("* * * * *", async () => {
+cron.schedule("*/10 * * * * *", async () => {
   const now = new Date();
-  console.log(`[Scheduler] Checking for scheduled posts at ${now.toISOString()}...`);
+  // Only log if we found something or we want to keep it silent on empty runs.
+  // console.log(`[Scheduler] Checking for scheduled posts at ${now.toISOString()}...`);
 
   /* ================= INSTAGRAM ================= */
   const igEvents = await Event.find({
@@ -38,6 +39,8 @@ cron.schedule("* * * * *", async () => {
       await event.save();
     } catch (err) {
       console.error(`[Scheduler] IG Failed for ${event.title}:`, err.message);
+      event.socialMedia.instagram.status = "FAILED";
+      await event.save();
     }
   }
 
@@ -75,6 +78,8 @@ cron.schedule("* * * * *", async () => {
       await event.save();
     } catch (err) {
       console.error(`[Scheduler] FB Failed for ${event.title}:`, err.message);
+      event.socialMedia.facebook.status = "FAILED";
+      await event.save();
     }
   }
 });

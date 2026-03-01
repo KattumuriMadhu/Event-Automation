@@ -300,6 +300,11 @@ export default function Dashboard() {
         tone: "formal",
       });
       setPreviewUrls([]);
+
+      // Clear the actual DOM file input so the same files can be selected again
+      const fileInput = document.getElementById("eventImages");
+      if (fileInput) fileInput.value = "";
+
     } catch (err) {
       setFormError(err.message || "❌ Failed to save event. Please try again.");
     } finally {

@@ -8,6 +8,7 @@ import Loader from "../components/Loader";
 import ImageSlider from "../components/ImageSlider";
 import CustomDatePicker from "../components/CustomDatePicker";
 import { API_BASE_URL } from "@/utils/config";
+import { CalendarX, PlusCircle } from "lucide-react";
 import { getUser, getToken, logoutUser } from "@/utils/auth";
 import toast from "react-hot-toast";
 import useKeyboardShortcut from "@/hooks/useKeyboardShortcut";
@@ -314,9 +315,21 @@ export default function EventsPage() {
       {/* ================= EVENTS ================= */}
       <div className={styles.list}>
         {events.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '50px', color: '#64748b' }}>
-            <h3>No events found 📂</h3>
-            <p>Create a new event from the dashboard to get started.</p>
+          <div className={styles.emptyStateContainer}>
+            <div className={styles.emptyStateIconWrapper}>
+              <CalendarX size={48} strokeWidth={1.5} />
+            </div>
+            <h3 className={styles.emptyStateTitle}>No Events Found</h3>
+            <p className={styles.emptyStateDesc}>
+              You haven't created any events yet. Build your first event to start engaging with your audience.
+            </p>
+            <button
+              className={styles.emptyStateBtn}
+              onClick={() => router.push("/dashboard")}
+            >
+              <PlusCircle size={20} />
+              Create New Event
+            </button>
           </div>
         ) : events.map((event) => (
           <div

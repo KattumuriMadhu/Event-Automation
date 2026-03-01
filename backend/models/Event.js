@@ -42,7 +42,7 @@ const eventSchema = new mongoose.Schema(
 
         status: {
           type: String,
-          enum: ["DRAFT", "SCHEDULED", "POSTED"],
+          enum: ["DRAFT", "SCHEDULED", "POSTED", "FAILED"],
           default: "DRAFT",
         },
 
@@ -59,7 +59,7 @@ const eventSchema = new mongoose.Schema(
 
         status: {
           type: String,
-          enum: ["DRAFT", "SCHEDULED", "POSTED"],
+          enum: ["DRAFT", "SCHEDULED", "POSTED", "FAILED"],
           default: "DRAFT",
         },
 
