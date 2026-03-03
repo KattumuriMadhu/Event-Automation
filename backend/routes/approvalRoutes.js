@@ -196,7 +196,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
                 <tr>
                   <td align="center">
                     <!-- Review & Approve Button -->
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/hod/approve/${event._id}" 
+                    <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/socialmedia-coordinator/approve/${event._id}" 
                        style="display:inline-block;background:#2563eb;color:#ffffff;padding:16px 36px;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;margin:0 8px 10px;box-shadow:0 4px 6px rgba(37,99,235,0.3);transition:all 0.3s">
                       🔍 Review & Approve Details
                     </a>
