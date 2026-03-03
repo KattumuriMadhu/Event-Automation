@@ -11,6 +11,9 @@ const eventSchema = new mongoose.Schema(
     resourcePerson: String,
     images: [String],
 
+    submittedByEmail: String,
+    submittedByName: String,
+
     approvalStatus: {
       type: String,
       enum: ["DRAFT", "SENT", "APPROVED", "REJECTED"],

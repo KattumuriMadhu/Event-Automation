@@ -14,11 +14,9 @@ function LoginContent() {
 
   /* New State for Logic */
   /* New State for Logic */
-  const [role, setRole] = useState("ADMIN"); // ADMIN or PROVIDER
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -30,7 +28,6 @@ function LoginContent() {
 
   /* ================= LOGIN ================= */
   const handleLogin = async () => {
-    // setError(""); // REMOVED to prevent layout jump
     setLoading(true);
 
     try {
@@ -43,15 +40,11 @@ function LoginContent() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Login failed");
+        toast.error(data.message || "Invalid credentials");
         return;
       }
 
-      // Enforce strict portal access
-      if (data.user.role !== role) {
-        setError(`Access Denied. Please login via the ${data.user.role === 'ADMIN' ? 'Admin' : 'Provider'} portal.`);
-        return;
-      }
+
 
       // Use consistent auth utility
       loginUser(data.token, data.user);
@@ -65,7 +58,7 @@ function LoginContent() {
         window.location.href = "/dashboard";
       }
     } catch {
-      setError("Server error. Try again later.");
+      toast.error("Server error. Try again later.");
     } finally {
       setLoading(false);
     }
@@ -129,58 +122,16 @@ function LoginContent() {
         <div className={styles.right}>
           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
 
-          {error && <div className={styles.error}>{error}</div>}
-
-          {/* ================= LOGIN ================= */}
-          {/* ================= LOGIN ================= */}
           {/* ================= LOGIN ================= */}
           <h2 className={styles.title}>Welcome Back</h2>
-          <p className={styles.subtitle}>Select your portal to login</p>
-
-          {/* Role Toggle */}
-          <div style={{
-            display: 'flex', gap: '10px', marginBottom: '25px', padding: '4px', background: '#f1f5f9', borderRadius: '12px'
-          }}>
-            <button
-              onClick={() => { setRole("ADMIN"); setError(""); }}
-              style={{
-                flex: 1,
-                padding: '10px',
-                borderRadius: '8px',
-                border: 'none',
-                background: role === "ADMIN" ? '#ffffff' : 'transparent',
-                color: role === "ADMIN" ? '#2563eb' : '#64748b',
-                boxShadow: role === "ADMIN" ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              Admin
-            </button>
-            <button
-              onClick={() => { setRole("PROVIDER"); setError(""); }}
-              style={{
-                flex: 1,
-                padding: '10px',
-                borderRadius: '8px',
-                border: 'none',
-                background: role === "PROVIDER" ? '#ffffff' : 'transparent',
-                color: role === "PROVIDER" ? '#2563eb' : '#64748b',
-                boxShadow: role === "PROVIDER" ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              Provider
-            </button>
-          </div>
 
           <input
             className={styles.input}
-            placeholder="Email"
-            onChange={(e) => { setEmail(e.target.value); setError(""); }}
+            placeholder="Email / Faculty ID"
+            onChange={(e) => { setEmail(e.target.value); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
 
           <div className={styles.passwordBox}>
@@ -188,7 +139,10 @@ function LoginContent() {
               className={styles.input}
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              onChange={(e) => { setPassword(e.target.value); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleLogin();
+              }}
             />
             <span
               className={styles.eye}
@@ -201,41 +155,37 @@ function LoginContent() {
 
           <div className={styles.row}>
             <div className={styles.remember}></div>
-            {role === "ADMIN" && (
-              <span
-                className={styles.forgot}
-                onClick={async () => {
-                  if (!email) {
-                    setError("Please enter your email address.");
-                    return;
-                  }
+            <span
+              className={styles.forgot}
+              onClick={async () => {
+                if (!email) {
+                  toast.error("Please enter your email address.");
+                  return;
+                }
 
-                  // Optional: minimal frontend validation
-                  setLoading(true);
-                  try {
-                    const res = await fetch(`${API_BASE_URL}/api/auth/check-email`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ email }),
-                    });
-                    const data = await res.json();
+                // Optional: minimal frontend validation
+                setLoading(true);
+                try {
+                  const res = await fetch(`${API_BASE_URL}/api/auth/check-email`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email }),
+                  });
+                  const data = await res.json();
 
-                    if (res.ok) {
-                      setShowForgotModal(true);
-                      setError("");
-                    } else {
-                      setError(data.message || "Invalid email for password reset");
-                    }
-                  } catch {
-                    setError("Unable to verify email. try again.");
-                  } finally {
-                    setLoading(false);
+                  if (res.ok) {
+                    setShowForgotModal(true);
+                  } else {
+                    toast.error(data.message || "Invalid email for password reset");
                   }
-                }}
-              >
-                Forgot Password?
-              </span>
-            )}
+                } catch {
+                  toast.error("Unable to verify email. try again.");
+                } finally {
+                  setLoading(false);
+                }
+              }}>
+              Forgot Password?
+            </span>
           </div>
 
           <button
@@ -292,11 +242,20 @@ function LoginContent() {
 
 
           {/* ================= SIGNUP ================= */}
-
-
-        </div>
+          <div className={styles.row} style={{ justifyContent: 'center', marginTop: '20px' }}>
+            <span className={styles.subtitle} style={{ fontSize: '0.95rem' }}>
+              Don&apos;t have an account?{" "}
+              <span
+                className={styles.forgot}
+                onClick={() => router.push("/register")}
+                style={{ fontWeight: '600' }}
+              >
+                Create new account
+              </span>
+            </span>
+          </div>        </div>
       </div>
-    </div>
+    </div >
   );
 }
 

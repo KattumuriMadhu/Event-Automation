@@ -42,7 +42,7 @@ export default function Header() {
 
     /* ================= PATH CHECK ================= */
     const pathname = usePathname();
-    if (pathname === "/login") return null;
+    if (pathname === "/login" || pathname === "/register") return null;
 
     return (
         <>
@@ -72,7 +72,6 @@ export default function Header() {
                     {!pathname.includes("/admin/social-post/") && (
                         user ? (
                             <div style={styles.userInfo}>
-                                <span style={styles.roleBadge}>{user.role || "USER"}</span>
                                 <span style={styles.userName}>{user.email || "Admin"}</span>
                                 <button
                                     style={styles.logoutBtn}

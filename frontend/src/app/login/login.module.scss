@@ -178,13 +178,15 @@
   color: var(--color-text-main);
   margin-bottom: 0.75rem;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
-xs .subtitle {
-  margin-bottom: 2.5rem;
+.subtitle {
+  margin-bottom: 3rem;
   color: var(--color-text-muted);
   font-size: 1.1rem;
   font-weight: 400;
+  text-align: center;
 }
 
 /* ================= COMPONENT STYLES ================= */
@@ -240,6 +242,45 @@ xs .subtitle {
 
 .input::placeholder {
   color: #94a3b8;
+}
+
+.inputWithBtn {
+  margin-bottom: 0;
+}
+
+.inputGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  background: var(--color-input-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.inputGroup:hover {
+  border-color: #cbd5e1;
+}
+
+.inputGroup:focus-within {
+  background: white;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.inputGroup .input {
+  margin-bottom: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  padding-right: 120px;
+  /* Space for button */
+}
+
+.inputGroup .input:focus {
+  box-shadow: none;
 }
 
 .passwordBox {
@@ -511,4 +552,70 @@ xs .subtitle {
   margin-top: 1rem;
   font-weight: 600;
   color: #16a34a;
+}
+
+.verifyBtn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 1.25rem;
+  height: calc(100% - 12px);
+  /* Slightly smaller than container */
+  min-height: 38px;
+  min-width: 110px;
+  /* Prevents button from shrinking too much when just icon */
+  border-radius: calc(var(--radius-md) - 4px);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+}
+
+.verifyBtn:hover:not(:disabled) {
+  transform: translateY(-50%) scale(1.02);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+}
+
+.verifyBtn:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.98);
+}
+
+.verifyBtn:disabled {
+  background: #cbd5e1;
+  color: #f8fafc;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: translateY(-50%);
+}
+
+.verifyBtnSuccess {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.verifyBtnSuccess:hover:not(:disabled) {
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

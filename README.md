@@ -29,6 +29,7 @@ A powerful full-stack application for managing events and automating social medi
 *   **AI Integration**: OpenAI API, Google Generative AI
 *   **Media Storage**: Cloudinary
 *   **Authentication**: Passport.js, BCrypt, JWT
+*   **Security**: Helmet, Rate Limiting, XSS Clean, MongoDB Sanitize, HPP, Morgan
 *   **Scheduling**: Node-cron
 
 ## 📦 Installation
@@ -59,6 +60,8 @@ OPENAI_API_KEYS=key1,key2
 GEMINI_API_KEY=your_gemini_key
 FACEBOOK_APP_ID=your_fb_app_id
 FACEBOOK_APP_SECRET=your_fb_app_secret
+SESSION_SECRET=your_secure_session_secret
+FRONTEND_URL=http://localhost:3000
 ```
 
 Start the backend server:

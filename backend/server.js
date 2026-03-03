@@ -7,6 +7,12 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import session from "express-session";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import hpp from "hpp";
+import morgan from "morgan";
 
 import connectDB from "./config/db.js";
 import passport from "./config/passport.js";
@@ -26,14 +32,44 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 /* ================= MIDDLEWARE ================= */
-app.use(cors());
+// Request logging
+app.use(morgan("dev"));
+
+// Set security HTTP headers
+app.use(helmet());
+
+// Limit requests from same API
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000, // Increased to 1000 to accommodate frontend polling (/api/auth/verify every 5s)
+  message: "Too many requests from this IP, please try again after 15 minutes"
+});
+app.use("/api", limiter);
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Prevent parameter pollution
+app.use(hpp());
+
+// Implement CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
+
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 /* ================= SESSION + PASSPORT ================= */
 app.use(
   session({
-    secret: "facebook_secret",
+    secret: process.env.SESSION_SECRET || "facebook_secret",
     resave: false,
     saveUninitialized: false,
   })
@@ -60,4 +96,18 @@ app.use("/api/chat", chatRoutes);
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
+});
+
+/* ================= GLOBAL ERROR HANDLER ================= */
+app.use((err, req, res, next) => {
+  console.error("🔥 Error:", err.stack);
+
+  if (process.env.NODE_ENV === "production") {
+    res.status(500).json({ message: "Internal Server Error" });
+  } else {
+    res.status(500).json({
+      message: err.message,
+      stack: err.stack
+    });
+  }
 });

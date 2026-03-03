@@ -71,6 +71,8 @@ router.post(
       const event = await Event.create({
         ...req.body,
         images: imagePaths,
+        submittedByEmail: req.user.email,
+        submittedByName: req.user.name || "User",
       });
 
       // ⚡ RESPOND IMMEDIATELY (DO NOT WAIT FOR AI)

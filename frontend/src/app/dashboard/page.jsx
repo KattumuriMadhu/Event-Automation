@@ -383,13 +383,9 @@ export default function Dashboard() {
       {(submitting || loadingAI) && <Loader />}
       {/* HEADER */}
       <header className={styles.header}>
-        <h1>{user?.role === "ADMIN" ? "Admin Dashboard" : "Dashboard"}</h1>
+        <h1>Dashboard</h1>
         <div className={styles.headerActions}>
-          {user?.role === "ADMIN" && (
-            <button className={styles.view} onClick={() => router.push("/admin/users")}>
-              Manage Users
-            </button>
-          )}
+
           <button className={styles.view} onClick={() => router.push("/events")}>
             View Events
           </button>

@@ -25,7 +25,6 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true);
 
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [hodEmails, setHodEmails] = useState("");
 
   const [editingEvent, setEditingEvent] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -56,9 +55,6 @@ export default function EventsPage() {
     // Auth check passed locally
     setUser(getUser());
     // REMOVED: setIsCheckingAuth(false); -> Wait for fetch
-
-    const saved = localStorage.getItem("hod_emails");
-    if (saved) setHodEmails(saved);
 
     const fetchEvents = () => {
       fetch(`${API_BASE_URL}/api/events`, {
@@ -169,8 +165,6 @@ export default function EventsPage() {
 
   /* ================= SEND APPROVAL ================= */
   const sendForApproval = async (id) => {
-    if (!hodEmails) return setShowEmailModal(true);
-
     const token = getToken();
     setSendingApprovalId(id);
 
@@ -180,7 +174,7 @@ export default function EventsPage() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ hodEmail: hodEmails }),
+      body: JSON.stringify({}),
     });
 
     setEvents((e) =>
@@ -297,13 +291,6 @@ export default function EventsPage() {
       <header className={styles.header}>
         <h1>Saved Events</h1>
         <div>
-          <button
-            className={styles.changeEmail}
-            onClick={() => setShowEmailModal(true)}
-          >
-            ✏️ Change HOD Email
-          </button>
-
           {/* Logout button moved to global Header */}
 
           <button className={styles.back} onClick={() => router.push("/dashboard")}>
@@ -585,44 +572,7 @@ export default function EventsPage() {
         </div>
       )}
 
-      {/* ================= CHANGE EMAIL ================= */}
-      {showEmailModal && (
-        <div className={styles.overlay}>
-          <div className={styles.hodModal}>
-            <h2>Change HOD Email</h2>
-            <p className={styles.hodSub}>
-              This email will receive approval requests.
-            </p>
 
-            <input
-              type="email"
-              value={hodEmails}
-              onChange={(e) => setHodEmails(e.target.value)}
-              placeholder="Enter HOD email address"
-            />
-
-            <div className={styles.hodActions}>
-              <button
-                className={styles.hodCancel}
-                onClick={() => setShowEmailModal(false)}
-              >
-                Cancel
-              </button>
-
-              <button
-                className={styles.hodSave}
-                onClick={() => {
-                  if (!hodEmails.trim()) return;
-                  localStorage.setItem("hod_emails", hodEmails);
-                  setShowEmailModal(false);
-                }}
-              >
-                Save Email
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* ================= EDIT MODAL ================= */}
       {editingEvent && (
         <div className={styles.overlay}>

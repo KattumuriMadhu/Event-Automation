@@ -1,0 +1,609 @@
+
+> event_automation@0.1.0 dev
+> next dev
+
+▲ Next.js 16.1.1 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.31.159:3000
+
+✓ Starting...
+✓ Ready in 505ms
+ GET /register 200 in 1206ms (compile: 1062ms, render: 144ms)
+ GET /login 200 in 76ms (compile: 65ms, render: 11ms)
+ GET /login 200 in 49ms (compile: 6ms, render: 43ms)
+ GET /register 200 in 16ms (compile: 5ms, render: 11ms)
+ GET /login 200 in 19ms (compile: 1321µs, render: 17ms)
+ GET /register 200 in 20ms (compile: 1349µs, render: 19ms)
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+✓ Compiled in 181ms
+ GET /register 200 in 98ms (compile: 34ms, render: 64ms)
+ GET /login 200 in 26ms (compile: 5ms, render: 21ms)
+ GET /register 200 in 25ms (compile: 4ms, render: 21ms)
+ GET /login 200 in 50ms (compile: 7ms, render: 43ms)
+ GET /register 200 in 26ms (compile: 6ms, render: 20ms)
+ GET /register 200 in 53ms (compile: 4ms, render: 49ms)
+ GET /login 200 in 29ms (compile: 8ms, render: 21ms)
+ GET /login 200 in 47ms (compile: 4ms, render: 43ms)
+ GET /register 200 in 27ms (compile: 8ms, render: 19ms)
+ GET /register 200 in 22ms (compile: 1520µs, render: 20ms)
+✓ Compiled in 125ms
+ GET /register 200 in 148ms (compile: 70ms, render: 78ms)
+ GET /login 200 in 66ms (compile: 52ms, render: 14ms)
+ GET /register 200 in 27ms (compile: 5ms, render: 22ms)
+ GET /register 200 in 29ms (compile: 8ms, render: 21ms)
+ GET /events 200 in 449ms (compile: 373ms, render: 76ms)
+ GET /login 200 in 25ms (compile: 3ms, render: 22ms)
+ GET /register 200 in 27ms (compile: 9ms, render: 18ms)
+✓ Compiled in 137ms
+ GET /register 200 in 91ms (compile: 74ms, render: 17ms)
+ GET /register 200 in 83ms (compile: 71ms, render: 12ms)
+✓ Compiled in 84ms
+✓ Compiled in 67ms
+ GET /register 200 in 27ms (compile: 8ms, render: 18ms)
+✓ Compiled in 50ms
+ GET /register 200 in 108ms (compile: 7ms, render: 102ms)
+ GET /register 200 in 48ms (compile: 4ms, render: 44ms)
+ GET /login 200 in 85ms (compile: 70ms, render: 15ms)
+ GET /register 200 in 8ms (compile: 1207µs, render: 6ms)
+✓ Compiled in 43ms
+ GET /login 200 in 26ms (compile: 8ms, render: 18ms)
+✓ Compiled in 33ms
+ GET /register 200 in 27ms (compile: 8ms, render: 19ms)
+✓ Compiled in 38ms
+✓ Compiled in 46ms
+✓ Compiled in 56ms
+ GET /register 200 in 20ms (compile: 1544µs, render: 18ms)
+ GET /register 200 in 10ms (compile: 902µs, render: 9ms)
+ GET /register 200 in 53ms (compile: 4ms, render: 49ms)
+ GET /register 200 in 48ms (compile: 5ms, render: 43ms)
+ GET /login 200 in 27ms (compile: 9ms, render: 18ms)
+✓ Compiled in 82ms
+ GET /register 200 in 17ms (compile: 4ms, render: 14ms)
+✓ Compiled in 45ms
+✓ Compiled in 33ms
+✓ Compiled in 39ms
+✓ Compiled in 31ms
+ GET /register 200 in 28ms (compile: 13ms, render: 15ms)
+ GET /login 200 in 28ms (compile: 8ms, render: 19ms)
+ GET /register 200 in 26ms (compile: 5ms, render: 21ms)
+✓ Compiled in 76ms
+✓ Compiled in 57ms
+✓ Compiled in 53ms
+ GET /register 200 in 51ms (compile: 9ms, render: 41ms)
+ GET /login 200 in 11ms (compile: 3ms, render: 8ms)
+ GET /login 200 in 117ms (compile: 3ms, render: 114ms)
+ GET /register 200 in 27ms (compile: 7ms, render: 20ms)
+✓ Compiled in 50ms
+✓ Compiled in 49ms
+ GET /register 200 in 48ms (compile: 9ms, render: 40ms)
+✓ Compiled in 48ms
+⨯ ./src/app/login/login.module.scss
+Error evaluating Node.js code
+Error: Expected digit.
+    ╷
+184 │   margin-bottom: 3.rem;
+    │                    ^
+    ╵
+  src/app/login/login.module.scss 184:20  root stylesheet
+Caused by: Error: Expected digit.
+    ╷
+184 │   margin-bottom: 3.rem;
+    │                    ^
+    ╵
+  src/app/login/login.module.scss 184:20  root stylesheet
+    [at Object.wrapException (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:2337:47)]
+    [at SpanScanner.error$3$length$position (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:86540:15)]
+    [at SpanScanner.error$2$position (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:86546:19)]
+    [at ScssParser0._stylesheet0$_tryDecimal$1$allowTrailingDot (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124641:12)]
+    [at ScssParser0._stylesheet0$_number$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124605:13)]
+    [at ScssParser0._stylesheet0$_expression$4$bracketList$consumeNewlines$singleEquals$until (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124201:44)]
+    [at ScssParser0._stylesheet0$_expression$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124296:19)]
+    [at ScssParser0._stylesheet0$_declarationOrBuffer$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122893:23)]
+    [at ScssParser0._stylesheet0$_declarationOrStyleRule$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122803:35)]
+    [at ScssParser0._stylesheet0$_statement$1$root (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122719:162)]
+    [at ScssParser0._stylesheet0$_statement$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122722:19)]
+    [at tear_off.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:2690:45)]
+    [at ScssParser0.children$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:118195:33)]
+    [at ScssParser0._stylesheet0$_withChildren$1$3 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126576:39)]
+    [at ScssParser0._stylesheet0$_withChildren$3 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126581:19)]
+    [at ScssParser0._stylesheet0$_withStyleRuleChildren$1$3 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122976:20)]
+    [at ScssParser0._stylesheet0$_styleRule$2 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122966:22)]
+    [at ScssParser0._stylesheet0$_variableDeclarationOrStyleRule$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122792:20)]
+    [at ScssParser0._stylesheet0$_statement$1$root (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122719:211)]
+    [at StylesheetParser_parse__closure0.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126646:17)]
+    [at ScssParser0.statements$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:118228:30)]
+    [at StylesheetParser_parse_closure0.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126632:23)]
+    [at ScssParser0.wrapSpanFormatException$1$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:116803:25)]
+    [at ScssParser0.wrapSpanFormatException$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:116860:19)]
+    [at ScssParser0.parse$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122683:19)]
+    [at Object.Stylesheet_Stylesheet$parse0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:31865:64)]
+    [at /Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:20842:30]
+    [at _wrapJsFunctionForAsync_closure.$protected (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:5005:15)]
+    [at _wrapJsFunctionForAsync_closure.call$2 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:38505:12)]
+    [at Object._asyncStartSync (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:4969:20)]
+    [at Object.compileStringAsync0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:20866:16)]
+    [at /Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:100911:38]
+    [at _wrapJsFunctionForAsync_closure.$protected (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:5005:15)]
+    [at _wrapJsFunctionForAsync_closure.call$2 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:38505:12)]
+    [at Object._asyncStartSync (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:4969:20)]
+    [at compileStringAsync_closure.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:100925:16)]
+    [at StaticClosure.compileStringAsync1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:25107:176)]
+    [at Object.Primitives_applyFunction (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:2216:30)]
+    [at Object.Function_apply (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:6448:16)]
+    [at _callDartFunctionFast (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:8247:16)]
+    [at sass.compileStringAsync (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:8225:18)]
+    [at n (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/next/dist/compiled/sass-loader/cjs.js:1:10729)]
+    [at Object.loader (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/next/dist/compiled/sass-loader/cjs.js:1:1121)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+
+Import traces:
+  Client Component Browser:
+    ./src/app/login/login.module.scss [Client Component Browser]
+    ./src/app/register/page.jsx [Client Component Browser]
+    ./src/app/register/page.jsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/login/login.module.scss [Client Component SSR]
+    ./src/app/register/page.jsx [Client Component SSR]
+    ./src/app/register/page.jsx [Server Component]
+
+
+ GET /register 500 in 347ms (compile: 273ms, render: 74ms)
+⨯ ./src/app/login/login.module.scss
+Error evaluating Node.js code
+Error: Expected digit.
+    ╷
+184 │   margin-bottom: 3.rem;
+    │                    ^
+    ╵
+  src/app/login/login.module.scss 184:20  root stylesheet
+Caused by: Error: Expected digit.
+    ╷
+184 │   margin-bottom: 3.rem;
+    │                    ^
+    ╵
+  src/app/login/login.module.scss 184:20  root stylesheet
+    [at Object.wrapException (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:2337:47)]
+    [at SpanScanner.error$3$length$position (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:86540:15)]
+    [at SpanScanner.error$2$position (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:86546:19)]
+    [at ScssParser0._stylesheet0$_tryDecimal$1$allowTrailingDot (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124641:12)]
+    [at ScssParser0._stylesheet0$_number$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124605:13)]
+    [at ScssParser0._stylesheet0$_expression$4$bracketList$consumeNewlines$singleEquals$until (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124201:44)]
+    [at ScssParser0._stylesheet0$_expression$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:124296:19)]
+    [at ScssParser0._stylesheet0$_declarationOrBuffer$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122893:23)]
+    [at ScssParser0._stylesheet0$_declarationOrStyleRule$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122803:35)]
+    [at ScssParser0._stylesheet0$_statement$1$root (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122719:162)]
+    [at ScssParser0._stylesheet0$_statement$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122722:19)]
+    [at tear_off.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:2690:45)]
+    [at ScssParser0.children$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:118195:33)]
+    [at ScssParser0._stylesheet0$_withChildren$1$3 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126576:39)]
+    [at ScssParser0._stylesheet0$_withChildren$3 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126581:19)]
+    [at ScssParser0._stylesheet0$_withStyleRuleChildren$1$3 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122976:20)]
+    [at ScssParser0._stylesheet0$_styleRule$2 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122966:22)]
+    [at ScssParser0._stylesheet0$_variableDeclarationOrStyleRule$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122792:20)]
+    [at ScssParser0._stylesheet0$_statement$1$root (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122719:211)]
+    [at StylesheetParser_parse__closure0.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126646:17)]
+    [at ScssParser0.statements$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:118228:30)]
+    [at StylesheetParser_parse_closure0.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:126632:23)]
+    [at ScssParser0.wrapSpanFormatException$1$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:116803:25)]
+    [at ScssParser0.wrapSpanFormatException$1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:116860:19)]
+    [at ScssParser0.parse$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:122683:19)]
+    [at Object.Stylesheet_Stylesheet$parse0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:31865:64)]
+    [at /Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:20842:30]
+    [at _wrapJsFunctionForAsync_closure.$protected (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:5005:15)]
+    [at _wrapJsFunctionForAsync_closure.call$2 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:38505:12)]
+    [at Object._asyncStartSync (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:4969:20)]
+    [at Object.compileStringAsync0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:20866:16)]
+    [at /Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:100911:38]
+    [at _wrapJsFunctionForAsync_closure.$protected (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:5005:15)]
+    [at _wrapJsFunctionForAsync_closure.call$2 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:38505:12)]
+    [at Object._asyncStartSync (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:4969:20)]
+    [at compileStringAsync_closure.call$0 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:100925:16)]
+    [at StaticClosure.compileStringAsync1 (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:25107:176)]
+    [at Object.Primitives_applyFunction (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:2216:30)]
+    [at Object.Function_apply (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:6448:16)]
+    [at _callDartFunctionFast (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:8247:16)]
+    [at sass.compileStringAsync (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/sass/sass.dart.js:8225:18)]
+    [at n (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/next/dist/compiled/sass-loader/cjs.js:1:10729)]
+    [at Object.loader (/Users/kattumurimadhu/Desktop/event_automation/frontend/node_modules/next/dist/compiled/sass-loader/cjs.js:1:1121)]
+    [at process.processTicksAndRejections (node:internal/process/task_queues:103:5)]
+
+Import traces:
+  Client Component Browser:
+    ./src/app/login/login.module.scss [Client Component Browser]
+    ./src/app/register/page.jsx [Client Component Browser]
+    ./src/app/register/page.jsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/login/login.module.scss [Client Component SSR]
+    ./src/app/register/page.jsx [Client Component SSR]
+    ./src/app/register/page.jsx [Server Component]
+
+
+ GET /register 500 in 15ms (compile: 8ms, render: 8ms)
+ GET /register 200 in 161ms (compile: 47ms, render: 114ms)
+ GET /register 200 in 40ms (compile: 3ms, render: 37ms)
+ GET /login 200 in 29ms (compile: 12ms, render: 16ms)
+ GET /register 200 in 26ms (compile: 6ms, render: 20ms)
+ GET /login 200 in 34ms (compile: 12ms, render: 22ms)
+ GET /register 200 in 28ms (compile: 7ms, render: 20ms)
+ GET /login 200 in 25ms (compile: 5ms, render: 20ms)
+ GET /register 200 in 26ms (compile: 5ms, render: 21ms)
+ GET /login 200 in 28ms (compile: 8ms, render: 20ms)
+ GET /register 200 in 26ms (compile: 6ms, render: 20ms)
+✓ Compiled in 91ms
+✓ Compiled in 79ms
+ GET /login 200 in 37ms (compile: 14ms, render: 23ms)
+ GET /login 200 in 55ms (compile: 4ms, render: 51ms)
+ GET /register 200 in 35ms (compile: 10ms, render: 25ms)
+✓ Compiled in 68ms
+✓ Compiled in 69ms
+ GET /login 200 in 48ms (compile: 13ms, render: 35ms)
+ GET /register 200 in 31ms (compile: 8ms, render: 23ms)
+✓ Compiled in 41ms
+✓ Compiled in 63ms
+ GET /register 200 in 24ms (compile: 4ms, render: 21ms)
+ GET /login 200 in 28ms (compile: 8ms, render: 20ms)
+ GET /register 200 in 27ms (compile: 5ms, render: 22ms)
+ GET /login 200 in 20ms (compile: 3ms, render: 16ms)
+ GET /register 200 in 27ms (compile: 8ms, render: 19ms)
+ GET /login 200 in 27ms (compile: 8ms, render: 20ms)
+ GET /register 200 in 25ms (compile: 6ms, render: 19ms)
+ GET /login 200 in 22ms (compile: 5ms, render: 17ms)
+ GET /login 200 in 52ms (compile: 7ms, render: 45ms)
+ GET /register 200 in 28ms (compile: 8ms, render: 20ms)
+ GET /register 200 in 46ms (compile: 3ms, render: 43ms)
+ GET /register 200 in 39ms (compile: 3ms, render: 36ms)
+ GET / 307 in 102ms (compile: 74ms, render: 28ms)
+ GET /login 200 in 24ms (compile: 3ms, render: 22ms)
+ GET /login 200 in 50ms (compile: 5ms, render: 45ms)
+✓ Compiled in 150ms
+ GET /register 200 in 30ms (compile: 10ms, render: 20ms)
+ GET /login 200 in 97ms (compile: 82ms, render: 15ms)
+ GET /register 200 in 29ms (compile: 9ms, render: 19ms)
+ GET /login 200 in 27ms (compile: 7ms, render: 20ms)
+ GET /register 200 in 24ms (compile: 4ms, render: 20ms)
+ GET /login 200 in 26ms (compile: 6ms, render: 20ms)
+ GET /register 200 in 24ms (compile: 4ms, render: 20ms)
+✓ Compiled in 104ms
+ GET /login 200 in 17ms (compile: 4ms, render: 13ms)
+ GET /register 200 in 89ms (compile: 74ms, render: 15ms)
+ GET /login 200 in 26ms (compile: 5ms, render: 21ms)
+ GET /dashboard 200 in 170ms (compile: 96ms, render: 74ms)
+✓ Compiled in 270ms
+ GET /dashboard 200 in 96ms (compile: 55ms, render: 41ms)
+ GET /dashboard 200 in 9ms (compile: 948µs, render: 8ms)
+ GET /dashboard 200 in 42ms (compile: 1073µs, render: 41ms)
+ GET /dashboard 200 in 36ms (compile: 1154µs, render: 35ms)
+ GET /dashboard 200 in 59ms (compile: 1052µs, render: 58ms)
+ GET /dashboard 200 in 56ms (compile: 3ms, render: 53ms)
+ GET /dashboard 200 in 50ms (compile: 2ms, render: 48ms)
+ GET /dashboard 200 in 32ms (compile: 2ms, render: 30ms)
+ GET /dashboard 200 in 29ms (compile: 818µs, render: 28ms)
+ GET /dashboard 200 in 38ms (compile: 872µs, render: 37ms)
+ GET /dashboard 200 in 31ms (compile: 857µs, render: 30ms)
+ GET /dashboard 200 in 30ms (compile: 824µs, render: 29ms)
+ GET /dashboard 200 in 31ms (compile: 821µs, render: 30ms)
+ GET /dashboard 200 in 29ms (compile: 781µs, render: 28ms)
+ GET /dashboard 200 in 30ms (compile: 748µs, render: 29ms)
+ GET /dashboard 200 in 32ms (compile: 784µs, render: 31ms)
+ GET /dashboard 200 in 32ms (compile: 1200µs, render: 31ms)
+ GET /dashboard 200 in 38ms (compile: 1324µs, render: 36ms)
+ GET /dashboard 200 in 37ms (compile: 1071µs, render: 36ms)
+ GET /dashboard 200 in 29ms (compile: 926µs, render: 28ms)
+ GET /dashboard 200 in 31ms (compile: 853µs, render: 30ms)
+ GET /dashboard 200 in 38ms (compile: 732µs, render: 37ms)
+ GET /dashboard 200 in 32ms (compile: 675µs, render: 31ms)
+ GET /dashboard 200 in 25ms (compile: 1093µs, render: 24ms)
+ GET /dashboard 200 in 16ms (compile: 911µs, render: 15ms)
+ GET /dashboard 200 in 9ms (compile: 846µs, render: 8ms)
+✓ Compiled in 78ms
+ GET /login 200 in 166ms (compile: 36ms, render: 130ms)
+ GET /dashboard 200 in 153ms (compile: 62ms, render: 91ms)
+✓ Compiled in 214ms
+✓ Compiled in 153ms
+ GET /login 200 in 247ms (compile: 129ms, render: 118ms)
+✓ Compiled in 138ms
+⨯ ReferenceError: role is not defined
+    at LoginContent (src/app/login/page.jsx:156:14)
+  154 |           <div className={styles.row}>
+  155 |             <div className={styles.remember}></div>
+> 156 |             {role === "ADMIN" && (
+      |              ^
+  157 |               <span
+  158 |                 className={styles.forgot}
+  159 |                 onClick={async () => { {
+  digest: '2782556982'
+}
+ GET /login 200 in 189ms (compile: 83ms, render: 107ms)
+✓ Compiled in 80ms
+⨯ ./src/app/login/page.jsx:186:15
+Parsing ecmascript source code failed
+[0m [90m 184 |[39m                 }
+ [90m 185 |[39m               }}
+[31m[1m>[22m[39m[90m 186 |[39m               [33m<[39m[33m/[39m[33mspan[39m[33m>[39m
+ [90m     |[39m               [31m[1m^[22m[39m
+ [90m 187 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 188 |[39m
+ [90m 189 |[39m         [33m<[39m[33mbutton[39m[0m
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./src/app/login/page.jsx [Client Component Browser]
+    ./src/app/login/page.jsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/login/page.jsx [Client Component SSR]
+    ./src/app/login/page.jsx [Server Component]
+
+
+
+./src/app/login/page.jsx:186:16
+Parsing ecmascript source code failed
+[0m [90m 184 |[39m                 }
+ [90m 185 |[39m               }}
+[31m[1m>[22m[39m[90m 186 |[39m               [33m<[39m[33m/[39m[33mspan[39m[33m>[39m
+ [90m     |[39m                [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 187 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 188 |[39m
+ [90m 189 |[39m         [33m<[39m[33mbutton[39m[0m
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/app/login/page.jsx [Client Component Browser]
+    ./src/app/login/page.jsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/login/page.jsx [Client Component SSR]
+    ./src/app/login/page.jsx [Server Component]
+
+
+ GET /login 500 in 73ms (compile: 60ms, render: 13ms)
+⨯ ./src/app/login/page.jsx:186:15
+Parsing ecmascript source code failed
+[0m [90m 184 |[39m                 }
+ [90m 185 |[39m               }}
+[31m[1m>[22m[39m[90m 186 |[39m               [33m<[39m[33m/[39m[33mspan[39m[33m>[39m
+ [90m     |[39m               [31m[1m^[22m[39m
+ [90m 187 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 188 |[39m
+ [90m 189 |[39m         [33m<[39m[33mbutton[39m[0m
+
+Expression expected
+
+Import traces:
+  Client Component Browser:
+    ./src/app/login/page.jsx [Client Component Browser]
+    ./src/app/login/page.jsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/login/page.jsx [Client Component SSR]
+    ./src/app/login/page.jsx [Server Component]
+
+
+
+./src/app/login/page.jsx:186:16
+Parsing ecmascript source code failed
+[0m [90m 184 |[39m                 }
+ [90m 185 |[39m               }}
+[31m[1m>[22m[39m[90m 186 |[39m               [33m<[39m[33m/[39m[33mspan[39m[33m>[39m
+ [90m     |[39m                [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 187 |[39m         [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m
+ [90m 188 |[39m
+ [90m 189 |[39m         [33m<[39m[33mbutton[39m[0m
+
+Unterminated regexp literal
+
+Import traces:
+  Client Component Browser:
+    ./src/app/login/page.jsx [Client Component Browser]
+    ./src/app/login/page.jsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/login/page.jsx [Client Component SSR]
+    ./src/app/login/page.jsx [Server Component]
+
+
+ GET /login 500 in 42ms (compile: 30ms, render: 11ms)
+✓ Compiled in 748ms
+ GET /login 200 in 190ms (compile: 83ms, render: 108ms)
+ GET /register 200 in 98ms (compile: 82ms, render: 16ms)
+ GET /dashboard 200 in 138ms (compile: 40ms, render: 98ms)
+ GET /login 200 in 51ms (compile: 6ms, render: 44ms)
+ GET /register 200 in 30ms (compile: 12ms, render: 19ms)
+ GET /login 200 in 9ms (compile: 1677µs, render: 8ms)
+ GET /dashboard 200 in 21ms (compile: 3ms, render: 18ms)
+ GET /login 200 in 53ms (compile: 11ms, render: 41ms)
+ GET /dashboard 200 in 21ms (compile: 2ms, render: 18ms)
+ GET /login 200 in 48ms (compile: 4ms, render: 44ms)
+✓ Compiled in 116ms
+✓ Compiled in 60ms
+ GET /login 200 in 63ms (compile: 17ms, render: 45ms)
+✓ Compiled in 88ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+✓ Compiled in 136ms
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 261ms (compile: 75ms, render: 186ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 55ms (compile: 13ms, render: 42ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 50ms (compile: 5ms, render: 46ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 79ms (compile: 20ms, render: 60ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 65ms (compile: 17ms, render: 48ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET / 307 in 211ms (compile: 73ms, render: 138ms)
+ GET /login 200 in 47ms (compile: 3ms, render: 44ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 70ms (compile: 15ms, render: 56ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 48ms (compile: 4ms, render: 44ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 60ms (compile: 13ms, render: 47ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 46ms (compile: 6ms, render: 41ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 46ms (compile: 4ms, render: 42ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 42ms (compile: 3ms, render: 38ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 20ms (compile: 1125µs, render: 19ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 63ms (compile: 15ms, render: 48ms)
+⨯ ReferenceError: error is not defined
+    at LoginContent (src/app/login/page.jsx:125:12)
+  123 |           <img src="/nsrit-logo.jpeg" className={styles.rightLogo} />
+  124 |
+> 125 |           {error && <div className={styles.error}>{error}</div>}
+      |            ^
+  126 |
+  127 |           {/* ================= LOGIN ================= */}
+  128 |           <h2 className={styles.title}>Welcome Back</h2> {
+  digest: '1638897722'
+}
+ GET /login 200 in 51ms (compile: 5ms, render: 46ms)

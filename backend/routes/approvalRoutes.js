@@ -12,14 +12,12 @@ const router = express.Router();
 router.post("/send/:eventId", authMiddleware, async (req, res) => {
   try {
     const { eventId } = req.params;
-    const { hodEmail } = req.body;
+
+    // Send to Social Media Coordinator directly
+    const coordinatorEmail = "madhu2000madhuk@gmail.com";
 
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
       return res.status(400).json({ message: "Invalid event ID" });
-    }
-
-    if (!hodEmail) {
-      return res.status(400).json({ message: "HOD email required" });
     }
 
     const event = await Event.findById(eventId);
@@ -28,7 +26,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
     }
 
     event.approvalStatus = "SENT";
-    event.approvalTimeline.push({ action: "SENT", by: "ADMIN" });
+    event.approvalTimeline.push({ action: "SENT", by: "USER" });
     await event.save();
 
     const transporter = nodemailer.createTransport({
@@ -43,7 +41,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
 
     await transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
-      to: hodEmail,
+      to: coordinatorEmail,
       subject: `Approval Required: ${event.title}`,
       html: `<!DOCTYPE html>
 <html lang="en">
@@ -309,7 +307,7 @@ router.post("/approve/:id", async (req, res) => {
 
     event.approvalStatus = "APPROVED";
     event.approvedAt = new Date();
-    event.approvalTimeline.push({ action: "APPROVED", by: "HOD" });
+    event.approvalTimeline.push({ action: "APPROVED", by: "COORDINATOR" });
     await event.save();
 
     /* ================= RANDOM PRO TIP ================= */
@@ -357,9 +355,12 @@ router.post("/approve/:id", async (req, res) => {
       },
     });
 
+    // Send email to original submitter or fallback to admin
+    const recipientEmail = event.submittedByEmail || process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
     await transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      to: recipientEmail,
       subject: `✅ Event Approved: ${event.title}`,
       html: `<!DOCTYPE html>
 <html lang="en">
@@ -404,7 +405,7 @@ router.post("/approve/:id", async (req, res) => {
                 <tr>
                   <td style="padding:16px 20px">
                     <p style="margin:0;color:#15803d;font-size:15px;line-height:1.6">
-                      <strong>Great news!</strong> Your event has been reviewed and approved by the HOD. You can now proceed to publish it on social media platforms.
+                      <strong>Great news!</strong> Your event has been reviewed and approved by the Social Media Coordinator. You can now proceed to publish it on social media platforms.
                     </p>
                   </td>
                 </tr>
@@ -535,7 +536,7 @@ router.post("/approve/:id", async (req, res) => {
                                   Approved By
                                 </div>
                                 <div style="color:#1e293b;font-size:15px;font-weight:600">
-                                  ${event.approvedBy} - Head of Department
+                                  Social Media Coordinator
                                 </div>
                               </td>
                             </tr>
@@ -718,7 +719,7 @@ router.post("/reject/:id", async (req, res) => {
     event.rejectedAt = new Date();
     event.approvalTimeline.push({
       action: "REJECTED",
-      by: "HOD",
+      by: "COORDINATOR",
       reason,
     });
     await event.save();
@@ -733,9 +734,11 @@ router.post("/reject/:id", async (req, res) => {
       },
     });
 
+    const rejectRecipient = event.submittedByEmail || process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
     await transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
-      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
+      to: rejectRecipient,
       subject: `❌ Event Rejected: ${event.title}`,
       html: `
 <!DOCTYPE html>

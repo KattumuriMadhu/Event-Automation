@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import styles from "./approve.module.scss";
 import confetti from "canvas-confetti";
 
-export default function HodApprovalPage() {
+export default function CoordinatorApprovalPage() {
   const { id } = useParams();
   const router = useRouter();
 

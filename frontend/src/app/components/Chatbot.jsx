@@ -30,6 +30,7 @@ export default function Chatbot() {
         pathname.startsWith("/hod") ||
         pathname.startsWith("/admin/social-post") ||
         pathname === "/login" ||
+        pathname === "/register" ||
         pathname.startsWith("/reset-password") ||
         pathname.startsWith("/create-password");
 
