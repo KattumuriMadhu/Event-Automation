@@ -13,7 +13,6 @@ A powerful full-stack application for managing events and automating social medi
     *   Manage content approval workflows.
 *   **Analytics Dashboard**:
     *   Interactive charts and calendar events overview.
-    *   **Auto-refreshing** statistical panels.
     *   Export comprehensive reports to **PDF** or **Excel (.xlsx)**.
 *   **Modern UI/UX**: 
     *   Built with **Next.js 15**, **Framer Motion**, and **Sass** for a responsive and animated experience.

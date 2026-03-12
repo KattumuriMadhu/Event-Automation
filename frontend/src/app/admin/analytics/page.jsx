@@ -83,17 +83,10 @@ export default function AnalyticsPage() {
     
     // Initial fetch
     fetchEvents(token);
-    
-    // Auto-refresh interval (every 30 seconds)
-    const intervalId = setInterval(() => {
-      fetchEvents(token, false); 
-    }, 30000);
-    
-    return () => clearInterval(intervalId);
   }, [router]);
 
-  const fetchEvents = async (token, setLoader = true) => {
-    if (setLoader) setLoading(true);
+  const fetchEvents = async (token) => {
+    setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/events`, {
         headers: {
@@ -107,7 +100,7 @@ export default function AnalyticsPage() {
     } catch (error) {
       console.error("Failed to load events for analytics", error);
     } finally {
-      if (setLoader) setLoading(false);
+      setLoading(false);
     }
   };
 
