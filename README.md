@@ -11,8 +11,13 @@ A powerful full-stack application for managing events and automating social medi
 *   **Social Media Automation**:
     *   Schedule and publish posts directly to **Instagram** and **Facebook**.
     *   Manage content approval workflows.
-*   **Secure Authentication**: User authentication protected with **Passport.js** and **JWT**.
-*   **Modern UI/UX**: Built with **Next.js 15**, **Framer Motion**, and **Sass** for a responsive and animated experience.
+*   **Analytics Dashboard**:
+    *   Interactive charts and calendar events overview.
+    *   **Auto-refreshing** statistical panels.
+    *   Export comprehensive reports to **PDF** or **Excel (.xlsx)**.
+*   **Modern UI/UX**: 
+    *   Built with **Next.js 15**, **Framer Motion**, and **Sass** for a responsive and animated experience.
+    *   Centralized, premium **Global Toast Notifications** system utilizing `react-hot-toast`.
 
 ## 🛠 Tech Stack
 
