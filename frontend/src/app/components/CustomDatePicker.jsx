@@ -14,8 +14,26 @@ export default function CustomDatePicker({ value, onChange }) {
     const [show, setShow] = useState(false);
     const containerRef = useRef(null);
 
-    // Parse initial date or default to today
-    const initialDate = value ? new Date(value) : new Date();
+    // Helper to parse 'YYYY-MM-DD' exactly as a local date
+    const parseLocal = (dateStr) => {
+        if (!dateStr) return new Date();
+        const parts = dateStr.split("T")[0].split("-");
+        if (parts.length === 3) {
+            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        }
+        return new Date(dateStr);
+    };
+
+    // Helper to format a local date to 'YYYY-MM-DD' strictly in local time
+    const formatLocal = (dateObj) => {
+        const y = dateObj.getFullYear();
+        const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+        const d = String(dateObj.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+    };
+
+    // Parse initial date or default to today safely
+    const initialDate = value ? parseLocal(value) : new Date();
     const [viewDate, setViewDate] = useState(initialDate);
 
     useEffect(() => {
@@ -41,11 +59,7 @@ export default function CustomDatePicker({ value, onChange }) {
 
     const handleDateClick = (day) => {
         const selected = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-        // Adjust for timezone offset to ensure YYYY-MM-DD string is correct
-        const offset = selected.getTimezoneOffset();
-        const correctDate = new Date(selected.getTime() - (offset * 60 * 1000));
-
-        onChange({ target: { name: 'date', value: correctDate.toISOString().split('T')[0] } });
+        onChange({ target: { name: 'date', value: formatLocal(selected) } });
         setShow(false);
     };
 
@@ -64,8 +78,11 @@ export default function CustomDatePicker({ value, onChange }) {
         // Days
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDate = new Date(year, month, day);
-            const isSelected = value === currentDate.toISOString().split('T')[0];
-            const isToday = new Date().toDateString() === currentDate.toDateString();
+            const currentDateStr = formatLocal(currentDate);
+            const valueStr = value ? value.split('T')[0] : "";
+            
+            const isSelected = valueStr === currentDateStr;
+            const isToday = formatLocal(new Date()) === currentDateStr;
 
             days.push(
                 <button
@@ -88,7 +105,7 @@ export default function CustomDatePicker({ value, onChange }) {
             <div className={styles.inputWrapper} onClick={() => setShow(!show)}>
                 <input
                     readOnly
-                    value={value ? new Date(value).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}
+                    value={value ? parseLocal(value).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}
                     placeholder="Select Event Date"
                     className={`${styles.dateInput} ${!value ? styles.placeholder : ''}`}
                 />
