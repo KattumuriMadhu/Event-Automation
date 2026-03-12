@@ -13,10 +13,10 @@ function LoginContent() {
   const searchParams = useSearchParams();
 
   /* New State for Logic */
-  /* New State for Logic */
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isCoordinator, setIsCoordinator] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +34,7 @@ function LoginContent() {
       const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email, password, isCoordinator }),
       });
 
       const data = await res.json();
@@ -44,18 +44,19 @@ function LoginContent() {
         return;
       }
 
-
-
       // Use consistent auth utility
       loginUser(data.token, data.user);
 
-      // Redirect based on role
       // Redirect based on role or intended destination
       const redirectPath = searchParams.get("redirect");
       if (redirectPath) {
         window.location.href = decodeURIComponent(redirectPath);
       } else {
-        window.location.href = "/dashboard";
+        if (data.user?.role === "ADMIN") {
+          window.location.href = "/events";
+        } else {
+          window.location.href = "/dashboard";
+        }
       }
     } catch {
       toast.error("Server error. Try again later.");
@@ -68,7 +69,6 @@ function LoginContent() {
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
     setForgotLoading(true);
-    // setForgotMessage(""); // REMOVED
     setForgotError("");
 
     try {
@@ -93,8 +93,6 @@ function LoginContent() {
   };
 
   /* ================= REGISTER ================= */
-
-
 
   return (
     <div className={styles.wrapper}>
@@ -125,20 +123,41 @@ function LoginContent() {
           {/* ================= LOGIN ================= */}
           <h2 className={styles.title}>Welcome Back</h2>
 
+          {/* Coordinator Checkbox */}
+          <div className={styles.row} style={{ justifyContent: "flex-start", marginBottom: "15px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontSize: "0.95rem", color: "#64748b" }}>
+              <input
+                type="checkbox"
+                checked={isCoordinator}
+                onChange={(e) => {
+                  setIsCoordinator(e.target.checked);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.code === "Enter" || e.code === "NumpadEnter") handleLogin();
+                }}
+              />
+              Login as Coordinator
+            </label>
+          </div>
+
+          {/* Always show the email input, even for coordinator */}
           <input
             className={styles.input}
             placeholder="Email / Faculty ID"
+            value={email}
             onChange={(e) => { setEmail(e.target.value); }}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleLogin();
             }}
           />
 
+
           <div className={styles.passwordBox}>
             <input
               className={styles.input}
               type={showPassword ? "text" : "password"}
-              placeholder="Password"
+              placeholder={isCoordinator ? "Coordinator Password" : "Password"}
+              value={password}
               onChange={(e) => { setPassword(e.target.value); }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleLogin();
@@ -152,12 +171,15 @@ function LoginContent() {
             </span>
           </div>
 
-
           <div className={styles.row}>
             <div className={styles.remember}></div>
             <span
               className={styles.forgot}
               onClick={async () => {
+                if (isCoordinator) {
+                  toast.error("Contact system administrator to reset coordinator password.");
+                  return;
+                }
                 if (!email) {
                   toast.error("Please enter your email address.");
                   return;
