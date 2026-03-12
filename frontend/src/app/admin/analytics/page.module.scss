@@ -1,0 +1,688 @@
+.page {
+  --color-primary: #2563eb;
+  --color-accent: #8b5cf6;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --border-radius: 1.25rem;
+
+  padding: 3rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.loaderArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.header {
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(135deg, #1e293b 0%, #3b82f6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.backBtn {
+  background: white;
+  color: var(--color-text-primary);
+  border: 1px solid #e2e8f0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 99px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    background: #f8fafc;
+    transform: translateX(-5px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.dashboardContainer {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  padding: 3rem;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+.welcomeSection {
+  margin-bottom: 2rem;
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+  }
+}
+
+.topActionsRow {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.analyticsCard {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--card-color);
+  }
+}
+
+.iconWrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--icon-bg);
+  color: var(--card-color);
+  flex-shrink: 0;
+}
+
+.cardInfo {
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .count {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+}
+
+.exportCard {
+  background: #ffffff;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 1rem;
+  }
+}
+
+.exportControls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dateInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+  }
+}
+
+.customDateWrapper {
+  width: 100%;
+  
+  /* Override CustomDatePicker's internal input to match our aesthetic */
+  :global(.CustomDatePicker_dateInput__xxxx) { /* We might need to adjust this if using CSS modules hash, but typically we can target the input inside */
+     padding: 0.6rem 0.75rem;
+     border: 1px solid #cbd5e1;
+     border-radius: 8px;
+     font-size: 0.95rem;
+     font-weight: 500;
+     color: var(--color-text-primary);
+     outline: none;
+     transition: all 0.2s;
+     width: 100%;
+     height: 38px;
+     box-sizing: border-box;
+
+     &:focus {
+       border-color: #8b5cf6;
+       box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+     }
+  }
+}
+
+.exportContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #8b5cf6;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  height: 38px;
+  margin-top: 17px;
+
+  &:hover {
+    background: #7c3aed;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.chevronIcon {
+  margin-left: 0.25rem;
+  opacity: 0.8;
+}
+
+.exportDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  min-width: 200px;
+  z-index: 50;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.exportOption {
+  background: transparent;
+  border: none;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-family: inherit;
+
+  &:hover {
+    background: #f1f5f9;
+    color: var(--color-primary);
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
+  }
+}
+
+.exportHint {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 0.75rem;
+}
+
+/* CHARTS SECTION */
+.chartsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.chartPanel {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 1.5rem;
+  }
+}
+
+.chartWrapper {
+  width: 100%;
+  height: 300px;
+
+  /* Remove default browser focus outline on the charting library elements */
+  :global(.recharts-wrapper) {
+    outline: none !important;
+  }
+  
+  :global(svg) {
+    outline: none !important;
+  }
+}
+
+.emptyChartState {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #e2e8f0;
+}
+
+/* CALENDAR SECTION */
+.calendarSection {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calendarCard {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  height: 460px;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.calSelectors {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.selectWrapper {
+  position: relative;
+  z-index: 100;
+}
+
+.customSelectBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  svg {
+    color: #64748b;
+  }
+}
+
+.customDropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  min-width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 110;
+  pointer-events: auto;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+  }
+}
+
+.customOption {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  transition: background 0.1s;
+
+  &:hover {
+    background: #f1f5f9;
+    color: var(--color-primary);
+  }
+}
+
+.activeOption {
+  background: #eff6ff;
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.calNav {
+  background: #f1f5f9;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e2e8f0;
+    color: var(--color-primary);
+  }
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: auto repeat(6, 40px);
+  gap: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.calDayName {
+  font-weight: 600;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.calEmpty {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.calDay {
+  background: transparent;
+  border: 2px solid transparent;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  position: relative;
+  padding: 0;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+}
+
+.selectedDay {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+}
+
+.hasEventDay {
+  border-color: #e2e8f0;
+  font-weight: 700;
+}
+
+.eventDot {
+  width: 5px;
+  height: 5px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 8px;
+}
+
+.selectedDay .eventDot {
+  background: #ffffff;
+}
+
+/* DAY EVENTS SIDEBAR */
+.dayEventsCard {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  height: 460px;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 1rem;
+  }
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  flex: 1;
+  min-height: unset;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+  }
+}
+
+.noEvents {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  padding: 2rem 0;
+}
+
+.eventListItem {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border-left: 4px solid var(--color-accent);
+  position: relative;
+
+  h4 {
+    margin: 0.25rem 0;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+  }
+}
+
+.evtType {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.evtAudience {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+  margin-bottom: 0px;
+}
+
+.evtStatus {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+}
+
+.statusAPPROVED {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.statusPUBLISHED {
+  background: #c7d2fe;
+  color: #3730a3;
+}
+
+.statusSENT {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.statusREJECTED {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.statusDRAFT {
+  background: #f1f5f9;
+  color: #475569;
+}
