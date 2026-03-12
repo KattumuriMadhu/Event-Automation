@@ -314,9 +314,11 @@ export default function AdminSocialPostPage() {
   return (
     <div className={styles.page}>
       <div className={`${styles.card} ${isClosing ? styles.fadeOut : ""}`}>
-        {/* ================= HEADER ================= */}
-        <header className={styles.header}>
-          <h1>{event.title}</h1>
+        {!showSuccess && (
+          <>
+            {/* ================= HEADER ================= */}
+            <header className={styles.header}>
+              <h1>{event.title}</h1>
           <span className={styles.status}>
             {published ? "📣 Published" : "✔ Approved"}
           </span>
@@ -465,8 +467,10 @@ export default function AdminSocialPostPage() {
                 : mode === "SCHEDULE"
                   ? "Schedule Post"
                   : "Publish Post"}
-            </button>
-          </section>
+              </button>
+            </section>
+          )}
+        </>
         )}
 
         {showSuccess && (
