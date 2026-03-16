@@ -72,7 +72,23 @@ export default function Header() {
                     {!pathname.includes("/admin/social-post/") && (
                         user ? (
                             <div style={styles.userInfo}>
-                                <span style={styles.userName}>{user.email || "Admin"}</span>
+                                {user.role === 'ADMIN' ? (
+                                    <div style={{
+                                        background: 'linear-gradient(135deg, #2563eb 0%, #db2777 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
+                                        fontWeight: '800',
+                                        fontSize: '16px',
+                                        letterSpacing: '0.3px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }}>
+                                        <span style={{ fontSize: '18px', WebkitTextFillColor: 'initial' }}>👑</span> Coordinator
+                                    </div>
+                                ) : (
+                                    <span style={styles.userName}>{user.email || "Admin"}</span>
+                                )}
                                 <button
                                     style={styles.logoutBtn}
                                     onClick={() => setShowLogoutConfirm(true)}

@@ -14,7 +14,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
     const { eventId } = req.params;
 
     // Send to Social Media Coordinator directly
-    const coordinatorEmail = "madhu2000madhuk@gmail.com";
+    const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
 
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
       return res.status(400).json({ message: "Invalid event ID" });
@@ -23,6 +23,27 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
     const event = await Event.findById(eventId);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
+    }
+
+    /* ================= DUPLICATE ON APPROVAL CHECK ================= */
+    const escapedTitle = event.title.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const titleRegex = new RegExp(`^${escapedTitle}$`, 'i');
+
+    const existingDuplicate = await Event.findOne({
+      _id: { $ne: eventId },
+      title: titleRegex,
+      date: event.date,
+      $or: [
+        { approvalStatus: { $in: ["SENT", "APPROVED"] } },
+        { "socialMedia.instagram.posted": true },
+        { "socialMedia.facebook.posted": true }
+      ]
+    });
+
+    if (existingDuplicate) {
+      return res.status(409).json({
+        message: "A similar event is already pending approval or has been published."
+      });
     }
 
     event.approvalStatus = "SENT";
@@ -129,7 +150,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
                               Event Date
                             </div>
                             <div style="color:#1e293b;font-size:15px;font-weight:500">
-                              ${new Date(event.date).toLocaleDateString('en-US', {
+                              ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })).join('<br/>') : new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'short',
         year: 'numeric',
         month: 'short',
@@ -268,7 +289,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
 router.get("/event/:id", async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) return res.status(404).send();
 
     // Check for expiration (5 hours)
     let isExpired = false;
@@ -295,35 +316,24 @@ router.get("/event/:id", async (req, res) => {
 
     res.json(eventObj);
   } catch {
-    res.status(500).json({ message: "Failed to fetch event" });
+    res.status(500).send();
   }
 });
 
 /* ================= APPROVE EVENT (HOD → ADMIN) ================= */
 router.post("/approve/:id", async (req, res) => {
   try {
+    console.log("APPROVE ROUTE HIT, req.params.id:", req.params.id);
     const event = await Event.findById(req.params.id);
-    if (!event) return res.status(404).json({ message: "Event not found" });
+    if (!event) {
+      console.log("APPROVE ROUTE - Event not found for id:", req.params.id);
+      return res.status(404).json({ message: "Event not found" });
+    }
 
     event.approvalStatus = "APPROVED";
     event.approvedAt = new Date();
     event.approvalTimeline.push({ action: "APPROVED", by: "COORDINATOR" });
     await event.save();
-
-    /* ================= RANDOM PRO TIP ================= */
-    const proTips = [
-      "Schedule your social media posts at least 48 hours before the event for maximum reach.",
-      "Use high-quality images (1080x1080) for better engagement on Instagram.",
-      "Include a clear Call to Action (CTA) in your caption to drive registrations.",
-      "Tag relevant speakers and partners in your post to expand your reach.",
-      "Use 3-5 relevant hashtags to make your post discoverable.",
-      "Post during peak hours (10 AM - 1 PM) for higher visibility.",
-      "Engage with comments within the first hour of posting to boost the algorithm.",
-      "Cross-promote your event on LinkedIn and Twitter for a professional audience.",
-      "Create a sense of urgency by mentioning 'Limited Seats' or registration deadlines.",
-      "Share behind-the-scenes content in Stories to build anticipation."
-    ];
-    const randomTip = proTips[Math.floor(Math.random() * proTips.length)];
 
     /* ================= GENERATE MAGIC LINK TOKEN ================= */
     // 1. Find Admin User
@@ -464,7 +474,7 @@ router.post("/approve/:id", async (req, res) => {
                                   Event Date
                                 </div>
                                 <div style="color:#1e293b;font-size:15px;font-weight:600">
-                                  ${new Date(event.date).toLocaleDateString('en-US', {
+                                  ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })).join('<br/>') : new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
@@ -583,20 +593,6 @@ router.post("/approve/:id", async (req, res) => {
                   </td>
                 </tr>
 
-              </table>
-
-              <!-- Tips Section (Optional) -->
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#eff6ff;border-radius:8px;border-left:4px solid #2563eb">
-                <tr>
-                  <td style="padding:16px 20px">
-                    <p style="margin:0 0 8px;color:#1e40af;font-size:13px;font-weight:600">
-                      💡 Pro Tip
-                    </p>
-                    <p style="margin:0;color:#1e40af;font-size:13px;line-height:1.6">
-                      ${randomTip}
-                    </p>
-                  </td>
-                </tr>
               </table>
 
             </td>

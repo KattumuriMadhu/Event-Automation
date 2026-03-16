@@ -26,7 +26,7 @@ Event Title: ${event.title}
 Department: ${event.department}
 Type: ${event.type}
 Audience: ${event.audience}
-Date: ${event.date}
+Date(s): ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}
 ${event.resourcePerson ? `Resource Person: ${event.resourcePerson}` : ""}
 Tone: ${event.tone}
 
@@ -114,7 +114,7 @@ ${event.customPrompt ? `CUSTOM INSTRUCTIONS: ${event.customPrompt}` : "Write an 
 
 Join us for **${event.title}** organized by the **${event.department}** department!
 
-📅 Date: ${new Date(event.date).toDateString()}
+📅 Date(s): ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}
 ${event.resourcePerson ? `📍 Resource Person: ${event.resourcePerson}` : ""}
 
 Don't miss this opportunity to learn and grow! 🎓
@@ -169,7 +169,7 @@ export async function suggestPostingTime(event) {
     Title: ${event.title}
     Audience: ${event.audience}
     Type: ${event.type}
-    Date: ${event.date}
+    Date(s): ${event.dates && event.dates.length > 1 ? event.dates.join(', ') : event.date}
 
     Suggest the BEST date and time to post this on social media (Facebook/Instagram) for maximum engagement.
     - Consider students are busy during class hours (9am-4pm).

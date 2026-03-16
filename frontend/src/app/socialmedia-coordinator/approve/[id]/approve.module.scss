@@ -1,14 +1,13 @@
 .page {
   min-height: 100vh;
-  background: #f8fafc;
+  background: #ffffff;
   padding: 40px 20px;
-  display: flex;
-  justify-content: center;
 }
 
 .container {
   width: 100%;
   max-width: 900px;
+  margin: 0 auto;
   background: #ffffff;
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
@@ -411,6 +410,7 @@
 
 /* ================= SUCCESS SECTION (COPIED FROM ADMIN PUBLIC) ================= */
 .inlineSuccess {
+  margin: 0 auto;
   margin-top: 2.5rem;
   padding-top: 2.5rem;
   animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
@@ -419,7 +419,7 @@
   justify-content: center;
   align-items: center;
   min-height: 50vh;
-  /* Centered in view */
+  width: 100%;
 }
 
 @keyframes slideInUp {

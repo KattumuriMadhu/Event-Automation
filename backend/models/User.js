@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     facultyId: { type: String, unique: true, sparse: true },
     status: { type: String, default: "ACTIVE" },
-    role: { type: String, default: "ADMIN" },
+    role: { type: String, default: "USER" },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },

@@ -48,20 +48,16 @@ export async function postToFacebook({ imageUrls, caption }) {
     // Actually, for Pages, the common way is to post photos to the Feed.
     // The 'feed' endpoint supports 'attached_media'
 
-    const attachedMedia = [];
+    const uploadPromises = imageUrls.slice(0, 10).map((url) =>
+        axios.post(`${GRAPH_URL}/${pageId}/photos`, {
+            url: url,
+            published: false,
+            access_token: pageAccessToken,
+        })
+    );
 
-    for (const url of imageUrls.slice(0, 10)) { // Max 10 usually
-        // Upload photo without publishing
-        const photoRes = await axios.post(
-            `${GRAPH_URL}/${pageId}/photos`,
-            {
-                url: url,
-                published: false,
-                access_token: pageAccessToken,
-            }
-        );
-        attachedMedia.push({ media_fbid: photoRes.data.id });
-    }
+    const uploadResults = await Promise.all(uploadPromises);
+    const attachedMedia = uploadResults.map((res) => ({ media_fbid: res.data.id }));
 
     const feedRes = await axios.post(
         `${GRAPH_URL}/${pageId}/feed`,

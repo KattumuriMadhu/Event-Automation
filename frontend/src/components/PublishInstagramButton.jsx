@@ -15,7 +15,7 @@ export default function PublishInstagramButton({ event }) {
         caption: `
 🎉 ${event.title}
 📍 ${event.location}
-🗓 ${event.date}
+🗓 ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString()).join(", ") : event.date}
 
 #NSRIT #Events
         `,

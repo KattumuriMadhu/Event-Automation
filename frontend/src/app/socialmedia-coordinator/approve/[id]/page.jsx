@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import styles from "./approve.module.scss";
 import confetti from "canvas-confetti";
+import { API_BASE_URL } from "@/utils/config";
 
 export default function CoordinatorApprovalPage() {
   const { id } = useParams();
@@ -20,21 +21,43 @@ export default function CoordinatorApprovalPage() {
 
   const [showRejectError, setShowRejectError] = useState(false);
   const [activeImage, setActiveImage] = useState(null);
+  const [serverError, setServerError] = useState(false);
 
-  /* ================= FETCH EVENT ================= */
+  /* ================= FETCH EVENT (WITH POLLING) ================= */
   useEffect(() => {
-    fetch(`http://localhost:5001/api/approval/event/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setEvent(data);
+    const fetchEventData = () => {
+      fetch(`${API_BASE_URL}/api/approval/event/${id}`)
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch event");
+          }
+          const text = await res.text();
+          return text ? JSON.parse(text) : null;
+        })
+        .then((data) => {
+          setEvent(data);
+          setServerError(false);
 
-        if (data.approvalStatus === "APPROVED") setStatus("APPROVED");
-        if (data.approvalStatus === "REJECTED") setStatus("REJECTED");
-        // Don't auto-set status on load, so we can show details instead of auto-closing
+          if (data.approvalStatus === "APPROVED") setStatus("APPROVED");
+          if (data.approvalStatus === "REJECTED") setStatus("REJECTED");
 
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Fetch error:", error);
+          setEvent(null);
+          setServerError(true);
+          setLoading(false);
+        });
+    };
+
+    // Initial fetch
+    fetchEventData();
+
+    // Poll every 5 seconds to catch if it was approved on another tab
+    const intervalId = setInterval(fetchEventData, 5000);
+
+    return () => clearInterval(intervalId);
   }, [id]);
 
   /* ================= AUTO-LOCK (RETURN TO EMAIL) ================= */
@@ -88,7 +111,7 @@ export default function CoordinatorApprovalPage() {
 
     setSubmitting(true);
 
-    await fetch(`http://localhost:5001/api/approval/${action}/${id}`, {
+    await fetch(`${API_BASE_URL}/api/approval/${action}/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body:
@@ -107,60 +130,96 @@ export default function CoordinatorApprovalPage() {
     }
   };
 
-  if (loading) return <p className={styles.loading}>Loading event…</p>;
-  if (!event) return <p className={styles.loading}>Event not found</p>;
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.container} style={{ textAlign: "center", padding: "50px" }}>
+          <h2>Loading event details...</h2>
+        </div>
+      </div>
+    );
+  }
+
+  if (serverError) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <h2>Cannot Connect to Server</h2>
+          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+          <button className={styles.approve} style={{ marginTop: '20px' }} onClick={() => window.location.reload()}>
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <h2>Event not found</h2>
+          <button className={styles.approve} onClick={() => router.push("/")}>
+            Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`${styles.page} ${isClosing ? styles.fadeOut : ''}`}>
-      <div className={styles.container}>
+      {/* ================= RESULT SCREEN (MATCHING ADMIN FLOW) ================= */}
+      {status && (
+        <div className={styles.inlineSuccess}>
+          <div className={styles.inlineSuccessCard}>
+            <div
+              className={styles.icon}
+              style={status === "REJECTED" ? { background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)", color: "#b91c1c" } : {}}
+            >
+              {status === "APPROVED" ? "✔" : "✖"}
+            </div>
+            <div>
+              <h3>
+                {status === "APPROVED"
+                  ? (event?.approvalStatus === "APPROVED" ? "This event is already approved" : "Event Approved Successfully")
+                  : (event?.approvalStatus === "REJECTED" ? "This event is already rejected" : "Event Rejected")}
+              </h3>
+              <p className={styles.successMeta}>
+                <strong>{event.title}</strong>
+              </p>
+              <p className={styles.successSub}>
+                {event.approvedAt ? `Approved on ${new Date(event.approvedAt).toLocaleString()}` :
+                  event.rejectedAt ? `Rejected on ${new Date(event.rejectedAt).toLocaleString()}` :
+                    `Action recorded • ${new Date().toLocaleString()}`}
+              </p>
 
-        {/* ================= RESULT SCREEN (MATCHING ADMIN FLOW) ================= */}
-        {status && (
-          <div className={styles.inlineSuccess}>
-            <div className={styles.inlineSuccessCard}>
-              <div
-                className={styles.icon}
-                style={status === "REJECTED" ? { background: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)", color: "#b91c1c" } : {}}
+              <span
+                className={styles.badge}
+                style={status === "REJECTED" ? { background: "#fee2e2", color: "#991b1b", borderColor: "#fca5a5" } : {}}
               >
-                {status === "APPROVED" ? "✔" : "✖"}
-              </div>
-              <div>
-                <h3>
-                  {status === "APPROVED"
-                    ? "Event Approved Successfully"
-                    : "Event Rejected"}
-                </h3>
-                <p className={styles.successMeta}>
-                  <strong>{event.title}</strong>
-                </p>
-                <p className={styles.successSub}>
-                  Action recorded • {new Date().toLocaleString()}
-                </p>
+                {status}
+              </span>
 
-                <span
-                  className={styles.badge}
-                  style={status === "REJECTED" ? { background: "#fee2e2", color: "#991b1b", borderColor: "#fca5a5" } : {}}
-                >
-                  {status}
-                </span>
-
-                <p className={styles.redirectText}>
-                  This page will close automatically…
-                </p>
-              </div>
+              <p className={styles.redirectText}>
+                This page will close automatically…
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ================= MAIN CONTENT ================= */}
-        {!status && !event.isExpired && (
-          <div className={styles.content}>
+      {/* ================= MAIN CONTENT ================= */}
+      {!status && (
+        <div className={styles.container}>
+          {!event.isExpired && (
+            <div className={styles.content}>
             <h1 className={styles.title}>{event.title}</h1>
 
             <div className={styles.meta}>
               <p><strong>Department:</strong> {event.department}</p>
               <p><strong>Type:</strong> {event.type}</p>
-              <p><strong>Date:</strong> {new Date(event.date).toDateString()}</p>
+              <p><strong>Date{event.dates && event.dates.length > 1 ? 's' : ''}:</strong> {event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}</p>
               <p><strong>Audience:</strong> {event.audience}</p>
               <p><strong>Resource Person:</strong> {event.resourcePerson}</p>
             </div>
@@ -177,7 +236,7 @@ export default function CoordinatorApprovalPage() {
                 {event.images.map((img, i) => {
                   const imageUrl = img.startsWith("http")
                     ? img
-                    : `http://localhost:5001${img}`;
+                    : `${API_BASE_URL}${img}`;
 
                   return (
                     <img
@@ -324,8 +383,8 @@ export default function CoordinatorApprovalPage() {
             </div>
           </div>
         )}
-
       </div>
+    )}
     </div>
   );
 }

@@ -71,19 +71,17 @@ export async function postToInstagram({ imageUrls, caption }) {
   }
 
   /* ===== CAROUSEL (2–10 images) ===== */
-  const children = [];
 
-  for (const url of imageUrls.slice(0, 10)) {
-    const res = await axios.post(
-      `${GRAPH_URL}/${igUserId}/media`,
-      {
-        image_url: url,
-        is_carousel_item: true,
-        access_token: accessToken,
-      }
-    );
-    children.push(res.data.id);
-  }
+  const uploadPromises = imageUrls.slice(0, 10).map((url) =>
+    axios.post(`${GRAPH_URL}/${igUserId}/media`, {
+      image_url: url,
+      is_carousel_item: true,
+      access_token: accessToken,
+    })
+  );
+
+  const uploadResults = await Promise.all(uploadPromises);
+  const children = uploadResults.map((res) => res.data.id);
 
   // Create Carousel Container
   const carouselRes = await axios.post(

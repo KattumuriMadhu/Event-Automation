@@ -122,7 +122,7 @@ function RegisterContent() {
                 return;
             }
 
-            toast.success("Account created successfully! Please login.");
+            toast.success("Account created successfully! Please wait for approval before logging in.");
             router.push("/login");
 
         } catch {

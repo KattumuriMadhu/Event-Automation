@@ -22,6 +22,7 @@ export default function AnalyticsPage() {
   const [user, setUser] = useState(null);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [serverError, setServerError] = useState(false);
 
   // Calendar State
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -60,7 +61,7 @@ export default function AnalyticsPage() {
         setIsMonthOpen(false);
         setIsYearOpen(false);
       }
-      
+
       // Close export menu if clicked outside
       if (!e.target.closest(`.${styles.exportContainer}`)) {
         setIsExportMenuOpen(false);
@@ -80,13 +81,14 @@ export default function AnalyticsPage() {
     }
 
     setUser(currentUser);
-    
+
     // Initial fetch
     fetchEvents(token);
   }, [router]);
 
   const fetchEvents = async (token) => {
     setLoading(true);
+    setServerError(false);
     try {
       const response = await fetch(`${API_BASE_URL}/api/events`, {
         headers: {
@@ -96,9 +98,12 @@ export default function AnalyticsPage() {
       if (response.ok) {
         const data = await response.json();
         setEvents(data);
+      } else {
+        setServerError(true);
       }
     } catch (error) {
       console.error("Failed to load events for analytics", error);
+      setServerError(true);
     } finally {
       setLoading(false);
     }
@@ -107,12 +112,43 @@ export default function AnalyticsPage() {
   // Update selected day's events when dates change
   useEffect(() => {
     const selectedDateString = selectedDate.toDateString();
-    const filtered = events.filter((e) => new Date(e.date).toDateString() === selectedDateString);
+    const filtered = events.filter((e) => {
+       if (e.dates && e.dates.length > 0) {
+           return e.dates.some(d => new Date(d).toDateString() === selectedDateString);
+       }
+       return new Date(e.date).toDateString() === selectedDateString;
+    });
     setDayEvents(filtered);
   }, [selectedDate, events]);
 
   if (loading) {
     return <div className={styles.loaderArea}>Loading Dashboard Analytics...</div>;
+  }
+
+  if (serverError) {
+    return (
+      <div className={styles.page}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: "center", padding: "50px" }}>
+          <h2>Cannot Connect to Server</h2>
+          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+          <button
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+            onClick={() => window.location.reload()}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
   }
 
   // Basic Stats
@@ -125,7 +161,7 @@ export default function AnalyticsPage() {
       const enDate = new Date(endDate);
       sDate.setHours(0, 0, 0, 0);
       enDate.setHours(0, 0, 0, 0);
-      
+
       if (enDate < sDate) {
         toast.error("End date must be greater than or equal to start date!");
         return;
@@ -134,21 +170,25 @@ export default function AnalyticsPage() {
 
     // Filter events by selected date range
     const filteredEvents = events.filter(e => {
-      const eDate = new Date(e.date);
-      // reset time for proper date comparison
-      eDate.setHours(0, 0, 0, 0);
+      // Check if ANY of the dates fall in range
+      const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : [e.date];
+      
+      return datesToCheck.some(d => {
+          const eDate = new Date(d);
+          eDate.setHours(0, 0, 0, 0);
 
-      if (startDate) {
-        const sDate = new Date(startDate);
-        sDate.setHours(0, 0, 0, 0);
-        if (eDate < sDate) return false;
-      }
-      if (endDate) {
-        const enDate = new Date(endDate);
-        enDate.setHours(0, 0, 0, 0);
-        if (eDate > enDate) return false;
-      }
-      return true;
+          if (startDate) {
+            const sDate = new Date(startDate);
+            sDate.setHours(0, 0, 0, 0);
+            if (eDate < sDate) return false;
+          }
+          if (endDate) {
+            const enDate = new Date(endDate);
+            enDate.setHours(0, 0, 0, 0);
+            if (eDate > enDate) return false;
+          }
+          return true;
+      });
     });
 
     return filteredEvents;
@@ -157,7 +197,7 @@ export default function AnalyticsPage() {
   const handleExport = (format) => {
     setIsExportMenuOpen(false);
     const filteredEvents = getFilteredEvents();
-    
+
     // Explicit undefined check because getFilteredEvents handles the error toast
     if (!filteredEvents) return;
 
@@ -171,7 +211,7 @@ export default function AnalyticsPage() {
       const isPosted = e.socialMedia?.instagram?.posted || e.socialMedia?.facebook?.posted;
       return [
         e.title || '',
-        new Date(e.date).toLocaleDateString(),
+        e.dates && e.dates.length > 0 ? e.dates.map(d => new Date(d).toLocaleDateString()).join(", ") : new Date(e.date).toLocaleDateString(),
         e.department || '',
         e.audience || '',
         e.type || '',
@@ -189,12 +229,12 @@ export default function AnalyticsPage() {
       XLSX.writeFile(workbook, `${fileName}.xlsx`);
     } else if (format === 'pdf') {
       const doc = new jsPDF("landscape");
-      
+
       doc.setFontSize(18);
       doc.text("Events Analytics Report", 14, 22);
       doc.setFontSize(10);
       doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
-      
+
       let dateString = "All time";
       if (startDate || endDate) {
         dateString = `${startDate || 'Start'} to ${endDate || 'Present'}`;
@@ -209,7 +249,7 @@ export default function AnalyticsPage() {
         headStyles: { fillColor: [139, 92, 246] },
         styles: { fontSize: 9 }
       });
-      
+
       doc.save(`${fileName}.pdf`);
     }
   };
@@ -226,6 +266,7 @@ export default function AnalyticsPage() {
   }
 
   events.forEach((e) => {
+    // For trends we just use the first date or primary date so we don't skew the total count with multi-day events
     const eDate = new Date(e.date);
     const mKey = `${monthNames[eDate.getMonth()]} ${eDate.getFullYear()}`;
     if (monthsDataMap[mKey] !== undefined) {
@@ -277,12 +318,15 @@ export default function AnalyticsPage() {
 
   const hasEventOnDate = (day) => {
     return events.some((e) => {
-      const eDate = new Date(e.date);
-      return (
-        eDate.getDate() === day &&
-        eDate.getMonth() === currentDate.getMonth() &&
-        eDate.getFullYear() === currentDate.getFullYear()
-      );
+      const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : [e.date];
+      return datesToCheck.some(d => {
+          const eDate = new Date(d);
+          return (
+            eDate.getDate() === day &&
+            eDate.getMonth() === currentDate.getMonth() &&
+            eDate.getFullYear() === currentDate.getFullYear()
+          );
+      });
     });
   };
 
@@ -335,20 +379,20 @@ export default function AnalyticsPage() {
                 </div>
               </div>
               <div className={styles.exportContainer}>
-                <button 
-                  className={styles.exportBtn} 
+                <button
+                  className={styles.exportBtn}
                   onClick={() => setIsExportMenuOpen(!isExportMenuOpen)}
                 >
                   <Download size={18} />
                   Download Report
                   <ChevronDown size={14} className={styles.chevronIcon} />
                 </button>
-                
+
                 <AnimatePresence>
                   {isExportMenuOpen && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }} 
-                      animate={{ opacity: 1, y: 0 }} 
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       className={styles.exportDropdown}
                     >
@@ -363,7 +407,7 @@ export default function AnalyticsPage() {
                 </AnimatePresence>
               </div>
             </div>
-            
+
             <p className={styles.exportHint}>Leave dates empty to download all events.</p>
           </motion.div>
         </div>

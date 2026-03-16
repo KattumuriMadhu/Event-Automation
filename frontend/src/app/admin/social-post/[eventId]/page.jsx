@@ -313,9 +313,8 @@ export default function AdminSocialPostPage() {
 
   return (
     <div className={styles.page}>
-      <div className={`${styles.card} ${isClosing ? styles.fadeOut : ""}`}>
-        {!showSuccess && (
-          <>
+      {!showSuccess && (
+        <div className={`${styles.card} ${isClosing ? styles.fadeOut : ""}`}>
             {/* ================= HEADER ================= */}
             <header className={styles.header}>
               <h1>{event.title}</h1>
@@ -337,8 +336,8 @@ export default function AdminSocialPostPage() {
           </div>
 
           <div>
-            <label>Date</label>
-            <span>{new Date(event.date).toDateString()}</span>
+            <label>Date{event.dates && event.dates.length > 1 ? 's' : ''}</label>
+            <span>{event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}</span>
           </div>
 
           <div>
@@ -467,11 +466,11 @@ export default function AdminSocialPostPage() {
                 : mode === "SCHEDULE"
                   ? "Schedule Post"
                   : "Publish Post"}
-              </button>
-            </section>
-          )}
-        </>
+            </button>
+          </section>
         )}
+      </div>
+    )}
 
         {showSuccess && (
           <div className={styles.inlineSuccess}>
@@ -493,7 +492,6 @@ export default function AdminSocialPostPage() {
             </div>
           </div>
         )}
-      </div>
     </div >
   );
 }

@@ -21,20 +21,9 @@
 /* ================= PAGE ================= */
 .page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  background: #ffffff;
   padding: 3rem 1.5rem;
   position: relative;
-}
-
-.page::before {
-  content: "";
-  position: fixed;
-  top: -50%;
-  right: -50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
-  pointer-events: none;
 }
 
 .loading {
@@ -558,13 +547,15 @@
 /* ================= SUCCESS SECTION ================= */
 .inlineSuccess {
   margin: 0 auto;
+  margin-top: 2.5rem;
+  padding-top: 2.5rem;
   animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: 50vh;
 }
 
 @keyframes slideInUp {
@@ -590,6 +581,7 @@
   overflow: hidden;
   max-width: 500px;
   margin: 0 auto;
+  width: 100%;
 }
 
 /* Success Gradient Background Effect */

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { getToken } from "@/utils/auth";
+import { getToken, getUser } from "@/utils/auth";
 
 export default function Chatbot() {
     const pathname = usePathname();
@@ -15,16 +15,34 @@ export default function Chatbot() {
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
+    const [isHovered, setIsHovered] = useState(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    const [isMounted, setIsMounted] = useState(false);
+    const [isCoordinator, setIsCoordinator] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
 
-    if (!pathname) return null;
+    useEffect(() => {
+        if (!isMounted) return;
+        const user = getUser();
+        if (user?.role === "ADMIN") {
+            setIsCoordinator(true);
+        } else {
+            setIsCoordinator(false);
+        }
+    }, [pathname, isMounted]);
+
+    if (!isMounted || !pathname) return null;
 
     const isHidden =
         pathname.startsWith("/hod") ||
@@ -34,7 +52,7 @@ export default function Chatbot() {
         pathname.startsWith("/reset-password") ||
         pathname.startsWith("/create-password");
 
-    if (isHidden) return null;
+    if (isHidden || isCoordinator) return null;
 
     const handleSend = async () => {
         if (!input.trim() || loading) return;
@@ -72,8 +90,6 @@ export default function Chatbot() {
     const handleKeyPress = (e) => {
         if (e.key === "Enter") handleSend();
     };
-
-    const [isHovered, setIsHovered] = useState(false);
 
     return (
         <>

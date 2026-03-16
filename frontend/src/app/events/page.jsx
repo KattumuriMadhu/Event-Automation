@@ -8,7 +8,7 @@ import Loader from "../components/Loader";
 import ImageSlider from "../components/ImageSlider";
 import CustomDatePicker from "../components/CustomDatePicker";
 import { API_BASE_URL } from "@/utils/config";
-import { CalendarX, PlusCircle } from "lucide-react";
+import { CalendarX, PlusCircle, LayoutDashboard, Clock, CheckCircle, XCircle } from "lucide-react";
 import { getUser, getToken, logoutUser } from "@/utils/auth";
 import toast from "react-hot-toast";
 import useKeyboardShortcut from "@/hooks/useKeyboardShortcut";
@@ -17,6 +17,7 @@ export default function EventsPage() {
   const router = useRouter();
 
   const [events, setEvents] = useState([]);
+  const [activeTab, setActiveTab] = useState('saved'); // Updated via useEffect for ADMIN
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [sendingApprovalId, setSendingApprovalId] = useState(null);
@@ -53,8 +54,12 @@ export default function EventsPage() {
     }
 
     // Auth check passed locally
-    setUser(getUser());
-    // REMOVED: setIsCheckingAuth(false); -> Wait for fetch
+    const localUser = getUser();
+    setUser(localUser);
+
+    if (localUser?.role === 'ADMIN' && activeTab === 'saved') {
+      setActiveTab('published');
+    }
 
     const fetchEvents = () => {
       fetch(`${API_BASE_URL}/api/events`, {
@@ -168,14 +173,28 @@ export default function EventsPage() {
     const token = getToken();
     setSendingApprovalId(id);
 
-    await fetch(`${API_BASE_URL}/api/approval/send/${id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({}),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/approval/send/${id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Failed to send approval");
+        setSendingApprovalId(null);
+        return;
+      }
+    } catch (error) {
+      console.error("Failed to send approval", error);
+      toast.error("Failed to send approval");
+      setSendingApprovalId(null);
+      return;
+    }
 
     setEvents((e) =>
       e.map((x) => (x._id === id ? { ...x, approvalStatus: "SENT" } : x))
@@ -241,6 +260,18 @@ export default function EventsPage() {
     return () => window.removeEventListener('keydown', handleEsc);
   }, [activeEvent]);
 
+  const displayEvents = events.filter(ev => {
+    const isPosted = ev.socialMedia?.instagram?.posted || ev.socialMedia?.facebook?.posted;
+    if (activeTab === 'saved') {
+      return ev.submittedByEmail === user?.email && (
+        ['DRAFT', 'SENT', 'REJECTED'].includes(ev.approvalStatus) ||
+        (ev.approvalStatus === 'APPROVED' && !isPosted)
+      );
+    } else {
+      return isPosted;
+    }
+  });
+
   if (!isMounted || loading || isCheckingAuth) {
     return <div style={{ position: 'fixed', inset: 0, background: 'white', zIndex: 2147483647 }} />;
   }
@@ -254,7 +285,7 @@ export default function EventsPage() {
           <div className={styles.emailSuccessModal}>
             <div className={styles.mailIcon}>📨</div>
             <h2>Approval Email Sent</h2>
-            <p>You’ll be notified once the HOD responds.</p>
+            <p>You’ll be notified once the Coordinator responds.</p>
             <span className={styles.pendingBadge}>PENDING APPROVAL</span>
           </div>
         </div>
@@ -289,36 +320,78 @@ export default function EventsPage() {
 
       {/* ================= HEADER ================= */}
       <header className={styles.header}>
-        <h1>Saved Events</h1>
-        <div>
-          {/* Logout button moved to global Header */}
-
-          <button className={styles.back} onClick={() => router.push("/dashboard")}>
-            Back to Dashboard
-          </button>
+        <h1>{activeTab === 'saved' ? 'Saved Events' : 'Published Events'}</h1>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          {user?.role !== 'ADMIN' && (
+            <>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'published' ? styles.activeTab : styles.inactiveTab}`}
+                onClick={() => setActiveTab('published')}
+              >
+                View Published Events
+              </button>
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'saved' ? styles.activeTab : styles.inactiveTab}`}
+                onClick={() => setActiveTab('saved')}
+              >
+                View Saved Events
+              </button>
+            </>
+          )}
+          {user?.role === 'ADMIN' ? (
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                className={styles.back}
+                onClick={() => router.push('/admin/analytics')}
+                style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)", color: "white" }}
+              >
+                📊 View Analytics
+              </button>
+              <button
+                className={styles.back}
+                onClick={() => router.push("/admin/pending")}
+                style={{ background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)", color: "white" }}
+              >
+                View Pending Events
+              </button>
+              <button className={styles.back} onClick={() => router.push("/admin/users")}>
+                Manage Users
+              </button>
+            </div>
+          ) : (
+            <button className={styles.back} onClick={() => router.push("/dashboard")}>
+              Back to Dashboard
+            </button>
+          )}
         </div>
       </header>
 
+      {/* ================= ADMIN ANALYTICS BOARD PREVIOUSLY HERE ================= */}
+
       {/* ================= EVENTS ================= */}
       <div className={styles.list}>
-        {events.length === 0 ? (
+        {displayEvents.length === 0 ? (
           <div className={styles.emptyStateContainer}>
             <div className={styles.emptyStateIconWrapper}>
               <CalendarX size={48} strokeWidth={1.5} />
             </div>
             <h3 className={styles.emptyStateTitle}>No Events Found</h3>
             <p className={styles.emptyStateDesc}>
-              You haven't created any events yet. Build your first event to start engaging with your audience.
+              {activeTab === 'saved'
+                ? "You haven't created any events yet. Build your first event to start engaging with your audience."
+                : "No published events found."}
             </p>
-            <button
-              className={styles.emptyStateBtn}
-              onClick={() => router.push("/dashboard")}
-            >
-              <PlusCircle size={20} />
-              Create New Event
-            </button>
+            {activeTab === 'saved' && user?.role !== 'ADMIN' && (
+              <button
+                className={styles.emptyStateBtn}
+                onClick={() => router.push("/dashboard")}
+              >
+                <PlusCircle size={20} />
+                Create New Event
+              </button>
+            )}
           </div>
-        ) : events.map((event) => (
+        ) : displayEvents.map((event) => (
           <div
             key={event._id}
             className={`${styles.card} ${deletingIds.has(event._id) ? styles.deleting : ''}`}
@@ -338,10 +411,17 @@ export default function EventsPage() {
 
               {/* STATUS BADGE OVERLAY */}
               <div className={styles.statusOverlay}>
-                {event.approvalStatus === "APPROVED" && <span className={styles.approvedBadge}>✔ Approved</span>}
-                {event.approvalStatus === "SENT" && <span className={styles.pendingBadge}>⏳ Pending</span>}
-                {event.approvalStatus === "REJECTED" && <span className={styles.rejectedBadge}>✖ Rejected</span>}
-                {event.approvalStatus === "DRAFT" && <span className={styles.draftBadge}>Draft</span>}
+                {(event.socialMedia?.instagram?.posted || event.socialMedia?.facebook?.posted) ? (
+                  <span className={styles.publishedBadge}>✔ Published</span>
+                ) : event.approvalStatus === "APPROVED" && user?.role !== 'ADMIN' ? (
+                  <span className={styles.approvedBadge}>✔ Approved</span>
+                ) : event.approvalStatus === "SENT" ? (
+                  <span className={styles.pendingBadge}>⏳ Pending</span>
+                ) : event.approvalStatus === "REJECTED" ? (
+                  <span className={styles.rejectedBadge}>✖ Rejected</span>
+                ) : event.approvalStatus === "DRAFT" ? (
+                  <span className={styles.draftBadge}>Draft</span>
+                ) : null}
               </div>
             </div>
 
@@ -352,12 +432,12 @@ export default function EventsPage() {
                   <span className={styles.departmentTag}>{event.department}</span>
                   <span className={styles.typeTag}>{event.type}</span>
 
-                  {/* Show Delete here if POSTED */}
-                  {(event.socialMedia?.instagram?.posted || event.socialMedia?.facebook?.posted) && (
+                  {/* Show Delete here ALWAYS FOR ADMIN, or if event is APPROVED but NOT POSTED for users */}
+                  {(user?.role === 'ADMIN' || (event.approvalStatus === 'APPROVED' && !(event.socialMedia?.instagram?.posted || event.socialMedia?.facebook?.posted))) && (
                     <button
                       className={styles.headerDeleteBtn}
                       onClick={() => setConfirmDeleteId(event._id)}
-                      title="Delete"
+                      title="Delete Event"
                     >
                       🗑
                     </button>
@@ -375,6 +455,14 @@ export default function EventsPage() {
                   <span className={styles.label}>Resource Person</span>
                   <span className={styles.value}>{event.resourcePerson || "N/A"}</span>
                 </div>
+                {event.dates && event.dates.length > 1 && (
+                  <div className={styles.metaItem}>
+                    <span className={styles.label}>Dates</span>
+                    <span className={styles.value}>
+                       {event.dates.map(d => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })).join(', ')}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {event.details && (
@@ -392,6 +480,29 @@ export default function EventsPage() {
               <div className={styles.actionRow}>
                 {/* ================= RESEND LOGIC ================= */}
                 {(() => {
+                  // Check if another event with the exact same title/date (case-insensitive)
+                  // is already SENT, APPROVED, or POSTED.
+                  const isDuplicatePendingOrApproved = events.some((otherEvent) => {
+                    if (otherEvent._id === event._id) return false;
+
+                    const titleMatch = otherEvent.title.toLowerCase().trim() === event.title.toLowerCase().trim();
+                    const dateMatch = new Date(otherEvent.date).toDateString() === new Date(event.date).toDateString();
+
+                    const statusMatch = ["SENT", "APPROVED"].includes(otherEvent.approvalStatus) ||
+                      otherEvent.socialMedia?.instagram?.posted ||
+                      otherEvent.socialMedia?.facebook?.posted;
+
+                    return titleMatch && dateMatch && statusMatch;
+                  });
+
+                  if (isDuplicatePendingOrApproved && ["DRAFT", "REJECTED"].includes(event.approvalStatus)) {
+                    return (
+                      <button className={styles.disabledApproveBtn} disabled title="An identical event is already pending or approved">
+                        Duplicate Pending/Approved
+                      </button>
+                    );
+                  }
+
                   if (event.approvalStatus === "REJECTED") {
                     return (
                       <button className={styles.resendBtn} onClick={() => sendForApproval(event._id)}>
@@ -434,13 +545,17 @@ export default function EventsPage() {
                 })()}
 
                 {/* Show Edit and Delete only if NOT posted. 
-                    If posted, Delete is in the header.
+                    If posted, Delete is in the header. ADMIN already has Delete in the header.
                 */}
                 <div className={styles.crudActions}>
-                  {!(event.socialMedia?.instagram?.posted || event.socialMedia?.facebook?.posted) && (
+                  {!(event.socialMedia?.instagram?.posted || event.socialMedia?.facebook?.posted) && user?.role !== 'ADMIN' && (
                     <>
-                      <button className={styles.iconBtn} onClick={() => setEditingEvent(event)} title="Edit">✏️</button>
-                      <button className={styles.iconBtn} onClick={() => setConfirmDeleteId(event._id)} title="Delete">🗑</button>
+                      {event.approvalStatus !== 'APPROVED' && (
+                        <button className={styles.iconBtn} onClick={() => setEditingEvent(event)} title="Edit">✏️</button>
+                      )}
+                      {activeTab === 'saved' && event.approvalStatus !== 'APPROVED' && (
+                        <button className={styles.iconBtn} onClick={() => setConfirmDeleteId(event._id)} title="Delete Event">🗑️</button>
+                      )}
                     </>
                   )}
                 </div>
@@ -552,14 +667,17 @@ export default function EventsPage() {
                   <span className={styles.value}>{activeEvent.resourcePerson || "N/A"}</span>
                 </div>
                 <div className={styles.metaItem}>
-                  <span className={styles.label}>Date</span>
+                  <span className={styles.label}>{activeEvent.dates && activeEvent.dates.length > 1 ? 'Dates' : 'Date'}</span>
                   <span className={styles.value}>
-                    {new Date(activeEvent.date).toLocaleDateString(undefined, {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {activeEvent.dates && activeEvent.dates.length > 1
+                      ? activeEvent.dates.map(d => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })).join(', ')
+                      : new Date(activeEvent.date).toLocaleDateString(undefined, {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                    }
                   </span>
                 </div>
               </div>
@@ -595,8 +713,15 @@ export default function EventsPage() {
                 required
               />
               <CustomDatePicker
-                value={editingEvent.date}
-                onChange={(e) => setEditingEvent({ ...editingEvent, date: e.target.value })}
+                isMulti={true}
+                value={editingEvent.dates && editingEvent.dates.length > 0 ? editingEvent.dates : editingEvent.date}
+                onChange={(e) => {
+                   if (e.target.name === 'dates') {
+                       setEditingEvent({ ...editingEvent, dates: e.target.value, date: e.target.value[0] });
+                   } else {
+                       setEditingEvent({ ...editingEvent, date: e.target.value });
+                   }
+                }}
               />
               <input
                 value={editingEvent.resourcePerson}

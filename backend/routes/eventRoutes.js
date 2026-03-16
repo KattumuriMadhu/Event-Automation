@@ -91,21 +91,15 @@ router.post(
         images: imagePaths,
         submittedByEmail: req.user.email,
         submittedByName: req.user.name || "User",
+        dates: parsedDates,
+        date: parsedDates[0]
       };
-      delete baseEventData.dates;
-      delete baseEventData.date;
+      delete baseEventData.dates_temp; // just in case
 
-      const createdEvents = [];
-      for (const d of parsedDates) {
-        const event = await Event.create({
-          ...baseEventData,
-          date: d,
-        });
-        createdEvents.push(event);
-      }
+      const event = await Event.create(baseEventData);
 
       // ⚡ RESPOND IMMEDIATELY (DO NOT WAIT FOR AI)
-      res.status(201).json(createdEvents.length === 1 ? createdEvents[0] : createdEvents);
+      res.status(201).json(event);
 
 
 

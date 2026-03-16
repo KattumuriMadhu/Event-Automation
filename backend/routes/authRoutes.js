@@ -86,14 +86,6 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Strong password validation
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        message: "Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character."
-      });
-    }
-
     if (!email.toLowerCase().endsWith("@nsrit.edu.in")) {
       return res.status(400).json({ message: "Only @nsrit.edu.in domain is allowed" });
     }
@@ -119,7 +111,7 @@ router.post("/register", async (req, res) => {
     await Otp.deleteMany({ email });
 
     // Send Approval Email to Coordinator
-    const coordinatorEmail = "madhu2000madhuk@gmail.com";
+    const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -174,13 +166,60 @@ router.post("/register", async (req, res) => {
 /* LOGIN */
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, isCoordinator } = req.body;
+
+    // Special bypass for Coordinator via UI checkbox
+    if (isCoordinator) {
+      const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
+      const isCoordinatorEmail = email.toLowerCase() === coordinatorEmail.toLowerCase() || email === "COORDINATOR";
+
+      if (isCoordinatorEmail && password === "madhuk") {
+        // Ensure this user exists in the DB so that the dashboard doesn't fail on user fetch
+        let user = await User.findOne({ email: coordinatorEmail });
+        if (!user) {
+          // Auto-create coordinator if they don't exist yet
+          const hashedPw = await bcrypt.hash("madhuk", 10);
+          user = await User.create({
+            name: "Coordinator",
+            email: coordinatorEmail,
+            password: hashedPw,
+            role: "ADMIN",
+            status: "ACTIVE"
+          });
+        }
+
+        const token = jwt.sign(
+          { id: user._id, role: "ADMIN" },
+          process.env.JWT_SECRET,
+          { expiresIn: "7d" }
+        );
+
+        return res.json({
+          token,
+          user: {
+            _id: user._id,
+            email: user.email,
+            role: "ADMIN",
+            status: "ACTIVE"
+          }
+        });
+      } else {
+        return res.status(400).json({ message: "Invalid coordinator credentials." });
+      }
+    }
+
+    const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const searchRegex = new RegExp(`^${escapeRegex(email)}$`, 'i');
 
     const user = await User.findOne({
-      $or: [{ email: email }, { facultyId: email }]
+      $or: [{ email: searchRegex }, { facultyId: searchRegex }]
     });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    if (user.role === "ADMIN" && !isCoordinator) {
+      return res.status(403).json({ message: "Check Login as Coordinator to sign in as a Coordinator" });
     }
 
     if (user.status === "PENDING") {
@@ -211,7 +250,8 @@ router.post("/login", async (req, res) => {
         status: user.status
       }
     });
-  } catch {
+  } catch (e) {
+    console.error(e);
     res.status(500).json({ message: "Login failed" });
   }
 });
@@ -732,3 +772,68 @@ export default router;
 
 /* GET ALL USERS (ADMIN ONLY) */
 
+
+/* ================= COORDINATOR USER MANAGEMENT ================= */
+
+/* GET ALL USERS (COORDINATOR ONLY) */
+router.get("/users", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const users = await User.find({ role: { $ne: "ADMIN" } }).select("-password").sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    console.error("FETCH USERS ERROR:", error);
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+
+/* DELETE USER (COORDINATOR ONLY) */
+router.delete("/users/:id", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role === "ADMIN") {
+      return res.status(403).json({ message: "Cannot delete another admin" });
+    }
+
+    await User.findByIdAndDelete(id);
+
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    console.error("DELETE USER ERROR:", error);
+    res.status(500).json({ message: "Failed to delete user" });
+  }
+});
+
+/* TOGGLE USER STATUS (COORDINATOR ONLY) */
+router.put("/users/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["ACTIVE", "BLOCKED"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role === "ADMIN") {
+      return res.status(403).json({ message: "Cannot modify coordinator status" });
+    }
+
+    user.status = status;
+    await user.save();
+
+    res.json(user);
+  } catch (error) {
+    console.error("UPDATE USER STATUS ERROR:", error);
+    res.status(500).json({ message: "Failed to update user status" });
+  }
+});
