@@ -176,10 +176,6 @@ function LoginContent() {
             <span
               className={styles.forgot}
               onClick={async () => {
-                if (isCoordinator) {
-                  toast.error("Contact system administrator to reset coordinator password.");
-                  return;
-                }
                 if (!email) {
                   toast.error("Please enter your email address.");
                   return;

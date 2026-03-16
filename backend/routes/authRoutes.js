@@ -173,19 +173,30 @@ router.post("/login", async (req, res) => {
       const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
       const isCoordinatorEmail = email.toLowerCase() === coordinatorEmail.toLowerCase() || email === "COORDINATOR";
 
-      if (isCoordinatorEmail && password === "madhuk") {
-        // Ensure this user exists in the DB so that the dashboard doesn't fail on user fetch
+      if (isCoordinatorEmail) {
         let user = await User.findOne({ email: coordinatorEmail });
-        if (!user) {
-          // Auto-create coordinator if they don't exist yet
-          const hashedPw = await bcrypt.hash("madhuk", 10);
-          user = await User.create({
-            name: "Coordinator",
-            email: coordinatorEmail,
-            password: hashedPw,
-            role: "ADMIN",
-            status: "ACTIVE"
-          });
+
+        // If coordinator exists, check their actual password (allows changed passwords to work!)
+        if (user) {
+          const match = await bcrypt.compare(password, user.password);
+          if (!match) {
+             return res.status(400).json({ message: "Invalid coordinator credentials." });
+          }
+        } 
+        // If coordinator doesn't exist yet, bootstrap them with the default "madhuk" password
+        else {
+          if (password === "madhuk") {
+            const hashedPw = await bcrypt.hash("madhuk", 10);
+            user = await User.create({
+              name: "Coordinator",
+              email: coordinatorEmail,
+              password: hashedPw,
+              role: "ADMIN",
+              status: "ACTIVE"
+            });
+          } else {
+             return res.status(400).json({ message: "Invalid coordinator credentials." });
+          }
         }
 
         const token = jwt.sign(
@@ -656,10 +667,6 @@ router.post("/check-email", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Only Admins can use this feature" });
-    }
-
     res.json({ message: "Valid" });
   } catch {
     res.status(500).json({ message: "Server error" });
@@ -674,10 +681,6 @@ router.post("/forgot-password", async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Only Admins can use this feature" });
     }
 
     // Generate Token
