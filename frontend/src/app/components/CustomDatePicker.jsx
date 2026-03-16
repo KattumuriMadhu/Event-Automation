@@ -13,7 +13,7 @@ const MONTHS = [
 export default function CustomDatePicker({ value, onChange, isMulti = false }) {
     const [show, setShow] = useState(false);
     const containerRef = useRef(null);
-    const [isMultiEnabled, setIsMultiEnabled] = useState(isMulti);
+    const [isMultiEnabled, setIsMultiEnabled] = useState(false);
 
     // Helper to parse 'YYYY-MM-DD' exactly as a local date
     const parseLocal = (dateStr) => {
@@ -159,22 +159,21 @@ export default function CustomDatePicker({ value, onChange, isMulti = false }) {
                                 {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
                             </span>
                             {isMulti && (
-                                <div className={styles.multiToggle} title="Allow selecting multiple dates">
+                                <label className={styles.toggleSwitch} title="Allow selecting multiple dates">
+                                    <span className={styles.toggleText}>Multi-Date</span>
                                     <input 
                                         type="checkbox" 
-                                        id="multiDateToggle"
                                         checked={isMultiEnabled}
                                         onChange={(e) => {
                                             setIsMultiEnabled(e.target.checked);
-                                            // Reset value to first element if turning off
                                             if (!e.target.checked && Array.isArray(value) && value.length > 1) {
                                                 onChange({ target: { name: 'dates', value: [value[0]] } });
                                             }
                                         }}
-                                        className={styles.multiCheckbox}
+                                        className={styles.hiddenCheckbox}
                                     />
-                                    <label htmlFor="multiDateToggle" className={styles.multiTooltip}>Multi-select</label>
-                                </div>
+                                    <div className={styles.toggleSlider}></div>
+                                </label>
                             )}
                         </div>
                         <button type="button" className={styles.navBtn} onClick={handleNextMonth}>
