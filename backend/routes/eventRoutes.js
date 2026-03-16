@@ -4,6 +4,7 @@ import fs from "fs";
 
 import Event from "../models/Event.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import adminMiddleware from "../middleware/adminMiddleware.js";
 import upload from "../middleware/upload.js";
 import cloudinary from "../config/cloudinary.js";
 
@@ -21,7 +22,18 @@ router.post(
     try {
       /* ================= VALIDATION ================= */
       const { title, date, type, details, department } = req.body;
-      if (!title || !date || !type || !details || !department) {
+      let parsedDates = [];
+      if (req.body.dates) {
+        try {
+          parsedDates = JSON.parse(req.body.dates);
+        } catch (e) {
+          return res.status(400).json({ message: "Invalid dates format" });
+        }
+      } else if (date) {
+        parsedDates = [date];
+      }
+
+      if (!title || parsedDates.length === 0 || !type || !details || !department) {
         return res.status(400).json({
           message: "Please fill all required details",
         });
@@ -35,6 +47,24 @@ router.post(
       if (req.files.length > 50) {
         return res.status(400).json({
           message: "Maximum 50 images allowed",
+        });
+      }
+
+      /* ================= DUPLICATE CHECK ================= */
+      // 1. Create a regex to match the title exactly but ignoring case
+      // 2. Escape special characters from title just in case
+      const escapedTitle = req.body.title.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const titleRegex = new RegExp(`^${escapedTitle}$`, 'i');
+
+      const existingEvent = await Event.findOne({
+        title: titleRegex,
+        date: { $in: parsedDates },
+      });
+
+      if (existingEvent) {
+        return res.status(409).json({
+          message: "Event with the same name and date already exists",
+          existingEventStatus: existingEvent.status
         });
       }
 
@@ -55,28 +85,27 @@ router.post(
         }
       }
 
-      /* ================= DUPLICATE CHECK ================= */
-      const existingEvent = await Event.findOne({
-        title: req.body.title,
-        date: req.body.date,
-      });
-
-      if (existingEvent) {
-        return res.status(409).json({
-          message: "Event with the same name and date already exists",
-        });
-      }
-
       /* ================= CREATE EVENT (FAST) ================= */
-      const event = await Event.create({
+      const baseEventData = {
         ...req.body,
         images: imagePaths,
         submittedByEmail: req.user.email,
         submittedByName: req.user.name || "User",
-      });
+      };
+      delete baseEventData.dates;
+      delete baseEventData.date;
+
+      const createdEvents = [];
+      for (const d of parsedDates) {
+        const event = await Event.create({
+          ...baseEventData,
+          date: d,
+        });
+        createdEvents.push(event);
+      }
 
       // ⚡ RESPOND IMMEDIATELY (DO NOT WAIT FOR AI)
-      res.status(201).json(event);
+      res.status(201).json(createdEvents.length === 1 ? createdEvents[0] : createdEvents);
 
 
 
@@ -196,7 +225,7 @@ router.put("/:id", authMiddleware, async (req, res) => {
 });
 
 /* ======================================================
-   DELETE EVENT (ADMIN)
+   DELETE EVENT (ADMIN / EVENT OWNER)
    ====================================================== */
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
@@ -212,6 +241,13 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     if (!event) {
       return res.status(404).json({
         message: "Event not found",
+      });
+    }
+
+    // Check authorization: Must be ADMIN or the owner of the event
+    if (req.user.role !== "ADMIN" && event.submittedByEmail !== req.user.email) {
+      return res.status(403).json({
+        message: "Not authorized to delete this event",
       });
     }
 

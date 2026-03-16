@@ -11,7 +11,7 @@ import loadingAnimation from "../lottie/loading.json";
 import CustomDatePicker from "../components/CustomDatePicker";
 import confetti from "canvas-confetti";
 import toast from "react-hot-toast";
-import { FaUserTimes, FaPen, FaList, FaTimes, FaCheck } from "react-icons/fa";
+import { FaUserTimes, FaPen, FaList, FaTimes, FaCheck, FaExclamationTriangle } from "react-icons/fa";
 import { API_BASE_URL } from "@/utils/config";
 import useKeyboardShortcut from "@/hooks/useKeyboardShortcut";
 
@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [showDeletedModal, setShowDeletedModal] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [loadingAI, setLoadingAI] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,7 +43,7 @@ export default function Dashboard() {
     type: "",
     details: "",
     department: "",
-    date: "",
+    dates: [],
     audience: "",
     resourcePerson: "",
     images: [],
@@ -79,8 +80,11 @@ export default function Dashboard() {
 
     // Local check first
     const localUser = getUser();
+    if (localUser?.role === "ADMIN") {
+      window.location.href = "/events";
+      return;
+    }
     setUser(localUser);
-    // REMOVED: setIsCheckingAuth(false); -> Wait for verification
 
     const checkStatus = () => {
       fetch(`${API_BASE_URL}/api/auth/verify`, {
@@ -88,6 +92,18 @@ export default function Dashboard() {
       })
         .then(async (res) => {
           if (res.ok) {
+            const data = await res.json();
+            // Update local user state from DB to sync role changes
+            if (data.user) {
+              if (data.user.role === "ADMIN") {
+                window.location.href = "/events";
+                return;
+              }
+              setUser(data.user);
+              if (typeof localStorage !== "undefined") {
+                localStorage.setItem("user", JSON.stringify(data.user));
+              }
+            }
             // Success - NOW we show the UI
             setIsCheckingAuth(false);
           } else if (res.status === 403 || res.status === 401) {
@@ -226,7 +242,7 @@ export default function Dashboard() {
     setSubmitting(true);
 
     /* ================= VALIDATION ================= */
-    if (!formData.title || !formData.type || !formData.department || !formData.date || !formData.details) {
+    if (!formData.title || !formData.type || !formData.department || formData.dates.length === 0 || !formData.details || !formData.audience) {
       setFormError("⚠️ Please fill all required details");
       toast.error("Please fill all required details");
       setSubmitting(false);
@@ -254,6 +270,7 @@ export default function Dashboard() {
     const form = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
       if (key === "images") value.forEach((img) => form.append("images", img));
+      else if (key === "dates") form.append("dates", JSON.stringify(value));
       else form.append(key, value);
     });
 
@@ -265,6 +282,13 @@ export default function Dashboard() {
       });
 
       const data = await res.json();
+
+      if (res.status === 409) {
+        setShowDuplicateModal(true);
+        setTimeout(() => setShowDuplicateModal(false), 3000);
+        setSubmitting(false);
+        return;
+      }
 
       if (res.status === 403 && data.message === "Account is blocked") {
         setShowBlockedModal(true);
@@ -293,7 +317,7 @@ export default function Dashboard() {
         type: "",
         details: "",
         department: "",
-        date: "",
+        dates: [],
         audience: "",
         resourcePerson: "",
         images: [],
@@ -390,6 +414,18 @@ export default function Dashboard() {
             View Events
           </button>
 
+          {user?.role === "ADMIN" && (
+            <button
+              className={styles.view}
+              onClick={() => router.push("/admin/users")}
+              style={{
+                marginLeft: "10px",
+                background: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
+              }}
+            >
+              Manage Users
+            </button>
+          )}
         </div>
       </header>
 
@@ -426,6 +462,7 @@ export default function Dashboard() {
                   <option value="">Type of Event</option>
                   <option>Workshop</option>
                   <option>Seminar</option>
+                  <option>Hackathon</option>
                   <option>Guest Lecture</option>
                   <option>Conference</option>
                   <option>Culturals</option>
@@ -466,7 +503,8 @@ export default function Dashboard() {
 
             {/* <input type="date" name="date" value={formData.date} onChange={handleChange} required /> */}
             <CustomDatePicker
-              value={formData.date}
+              isMulti={true}
+              value={formData.dates}
               onChange={handleChange}
             />
 
@@ -619,6 +657,29 @@ export default function Dashboard() {
             <h3>Account Deactivated</h3>
             <p>Your account has been removed by the administrator. Access is no longer available.</p>
             <div className={styles.redirectText}>Redirecting to login...</div>
+          </div>
+        </div>
+      )}
+
+      {/* DUPLICATE EVENT MODAL */}
+      {showDuplicateModal && (
+        <div className={styles.overlay}>
+          <div className={styles.modal}>
+            <div className={styles.warningIconWrapper}>
+              <FaExclamationTriangle />
+            </div>
+            <h3>Event Already Exists</h3>
+            <p>An event with this name and date has already been saved, approved, or published by another user.</p>
+
+            <div className={styles.actions}>
+              <button
+                className={styles.cancel}
+                onClick={() => setShowDuplicateModal(false)}
+                style={{ background: '#fef3c7', color: '#b45309' }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

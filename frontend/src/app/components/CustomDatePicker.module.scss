@@ -147,3 +147,60 @@
 .empty {
     pointer-events: none;
 }
+
+/* MULTI-SELECT TOGGLE */
+.monthToggleWrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.multiToggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.multiCheckbox {
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    accent-color: #2563eb;
+    margin: 0;
+}
+
+.multiTooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Arrow for tooltip */
+.multiTooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px;
+    border-style: solid;
+    border-color: #1e293b transparent transparent transparent;
+}
+
+.multiToggle:hover .multiTooltip {
+    opacity: 1;
+    visibility: visible;
+}

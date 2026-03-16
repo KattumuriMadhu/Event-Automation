@@ -10,9 +10,10 @@ const MONTHS = [
     "July", "August", "September", "October", "November", "December"
 ];
 
-export default function CustomDatePicker({ value, onChange }) {
+export default function CustomDatePicker({ value, onChange, isMulti = false }) {
     const [show, setShow] = useState(false);
     const containerRef = useRef(null);
+    const [isMultiEnabled, setIsMultiEnabled] = useState(isMulti);
 
     // Helper to parse 'YYYY-MM-DD' exactly as a local date
     const parseLocal = (dateStr) => {
@@ -32,9 +33,14 @@ export default function CustomDatePicker({ value, onChange }) {
         return `${y}-${m}-${d}`;
     };
 
-    // Parse initial date or default to today safely
-    const initialDate = value ? parseLocal(value) : new Date();
-    const [viewDate, setViewDate] = useState(initialDate);
+    const getInitialViewDate = () => {
+        if (isMulti) {
+            return value && value.length > 0 ? parseLocal(value[0]) : new Date();
+        }
+        return value ? parseLocal(value) : new Date();
+    };
+
+    const [viewDate, setViewDate] = useState(getInitialViewDate());
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -59,8 +65,22 @@ export default function CustomDatePicker({ value, onChange }) {
 
     const handleDateClick = (day) => {
         const selected = new Date(viewDate.getFullYear(), viewDate.getMonth(), day);
-        onChange({ target: { name: 'date', value: formatLocal(selected) } });
-        setShow(false);
+        const selectedStr = formatLocal(selected);
+
+        if (isMultiEnabled) {
+            let newValues = Array.isArray(value) ? [...value] : [];
+            if (newValues.includes(selectedStr)) {
+                newValues = newValues.filter(d => d !== selectedStr);
+            } else {
+                newValues.push(selectedStr);
+            }
+            newValues.sort((a, b) => new Date(a) - new Date(b));
+            onChange({ target: { name: 'dates', value: newValues } });
+        } else {
+            // When switching to single array if needed or just string
+            onChange({ target: { name: isMulti ? 'dates' : 'date', value: isMulti ? [selectedStr] : selectedStr } });
+            setShow(false);
+        }
     };
 
     const renderDays = () => {
@@ -79,9 +99,15 @@ export default function CustomDatePicker({ value, onChange }) {
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDate = new Date(year, month, day);
             const currentDateStr = formatLocal(currentDate);
-            const valueStr = value ? value.split('T')[0] : "";
             
-            const isSelected = valueStr === currentDateStr;
+            let isSelected = false;
+            if (isMultiEnabled || isMulti) {
+                isSelected = Array.isArray(value) && value.includes(currentDateStr);
+            } else {
+                const valueStr = value ? value.split('T')[0] : "";
+                isSelected = valueStr === currentDateStr;
+            }
+            
             const isToday = formatLocal(new Date()) === currentDateStr;
 
             days.push(
@@ -99,15 +125,24 @@ export default function CustomDatePicker({ value, onChange }) {
         return days;
     };
 
+    const getDisplayText = () => {
+        if (isMulti) {
+            if (!value || value.length === 0) return "";
+            if (value.length === 1) return parseLocal(value[0]).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
+            return value.map(d => parseLocal(d).toLocaleDateString("en-US", { month: 'short', day: 'numeric' })).join(', ');
+        }
+        return value ? parseLocal(value).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "";
+    };
+
     return (
         <div className={styles.datePickerContainer} ref={containerRef}>
             {/* INPUT TRIGGER */}
             <div className={styles.inputWrapper} onClick={() => setShow(!show)}>
                 <input
                     readOnly
-                    value={value ? parseLocal(value).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : ""}
-                    placeholder="Select Event Date"
-                    className={`${styles.dateInput} ${!value ? styles.placeholder : ''}`}
+                    value={getDisplayText()}
+                    placeholder={isMulti ? "Select Event Dates" : "Select Event Date"}
+                    className={`${styles.dateInput} ${(!value || (isMulti && value.length === 0)) ? styles.placeholder : ''}`}
                 />
                 <CalendarIcon size={18} className={styles.calendarIcon} />
             </div>
@@ -119,9 +154,29 @@ export default function CustomDatePicker({ value, onChange }) {
                         <button type="button" className={styles.navBtn} onClick={handlePrevMonth}>
                             <ChevronLeft size={20} />
                         </button>
-                        <span className={styles.currentMonth}>
-                            {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
-                        </span>
+                        <div className={styles.monthToggleWrapper}>
+                            <span className={styles.currentMonth}>
+                                {MONTHS[viewDate.getMonth()]} {viewDate.getFullYear()}
+                            </span>
+                            {isMulti && (
+                                <div className={styles.multiToggle} title="Allow selecting multiple dates">
+                                    <input 
+                                        type="checkbox" 
+                                        id="multiDateToggle"
+                                        checked={isMultiEnabled}
+                                        onChange={(e) => {
+                                            setIsMultiEnabled(e.target.checked);
+                                            // Reset value to first element if turning off
+                                            if (!e.target.checked && Array.isArray(value) && value.length > 1) {
+                                                onChange({ target: { name: 'dates', value: [value[0]] } });
+                                            }
+                                        }}
+                                        className={styles.multiCheckbox}
+                                    />
+                                    <label htmlFor="multiDateToggle" className={styles.multiTooltip}>Multi-select</label>
+                                </div>
+                            )}
+                        </div>
                         <button type="button" className={styles.navBtn} onClick={handleNextMonth}>
                             <ChevronRight size={20} />
                         </button>
