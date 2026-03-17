@@ -21,7 +21,7 @@ export default function PendingApprovalsPage() {
     const [rejectingId, setRejectingId] = useState(null);
     const [rejectReason, setRejectReason] = useState("");
     const [isRejecting, setIsRejecting] = useState(false);
-    const [isApprovingId, setIsApprovingId] = useState(null);
+    const [approvingIds, setApprovingIds] = useState([]);
 
     useEffect(() => {
         const token = getToken();
@@ -70,7 +70,7 @@ export default function PendingApprovalsPage() {
     };
 
     const handleApprove = async (eventId) => {
-        setIsApprovingId(eventId);
+        setApprovingIds(prev => [...prev, eventId]);
         const token = getToken();
         try {
             const response = await fetch(`${API_BASE_URL}/api/approval/approve/${eventId}`, {
@@ -98,7 +98,7 @@ export default function PendingApprovalsPage() {
             console.error("handleApprove error", error);
             toast.error(error.message || "Network error during approval");
         } finally {
-            setIsApprovingId(null);
+            setApprovingIds(prev => prev.filter(id => id !== eventId));
         }
     };
 
@@ -236,9 +236,9 @@ export default function PendingApprovalsPage() {
                                                 <button
                                                     className={styles.actionApproveBtn}
                                                     onClick={() => handleApprove(e._id)}
-                                                    disabled={isApprovingId === e._id}
+                                                    disabled={approvingIds.includes(e._id)}
                                                 >
-                                                    {isApprovingId === e._id ? "..." : "✓ Approve"}
+                                                    {approvingIds.includes(e._id) ? "Approving..." : "✓ Approve"}
                                                 </button>
                                                 <button
                                                     className={styles.actionRejectBtn}

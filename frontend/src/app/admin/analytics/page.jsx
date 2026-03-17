@@ -172,6 +172,9 @@ export default function AnalyticsPage() {
 
     // Filter events by selected date range
     const filteredEvents = events.filter(e => {
+      // If no start date or end date is set, return all events
+      if (!startDate && !endDate) return true;
+
       // Check if ANY of the dates fall in range
       const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : (e.date ? [e.date] : []);
       
@@ -208,16 +211,16 @@ export default function AnalyticsPage() {
       return;
     }
 
-    const headers = ["Event Title", "Date", "Department", "Audience Type", "Event Type", "Status", "Social Media Posted"];
-    const rows = filteredEvents.map(e => {
+    const headers = ["S.No.", "Event Title", "Date", "Department", "Audience Type", "Event Type", "Social Media Posted"];
+    const rows = filteredEvents.map((e, index) => {
       const isPosted = e.socialMedia?.instagram?.posted || e.socialMedia?.facebook?.posted;
       return [
+        index + 1,
         e.title || '',
         e.dates && e.dates.length > 0 ? e.dates.map(d => new Date(d).toLocaleDateString()).join(", ") : (e.date ? new Date(e.date).toLocaleDateString() : 'TBA'),
         e.department || '',
         e.audience || '',
         e.type || '',
-        e.approvalStatus || '',
         isPosted ? 'Yes' : 'No'
       ];
     });
@@ -249,7 +252,9 @@ export default function AnalyticsPage() {
         body: rows,
         theme: "striped",
         headStyles: { fillColor: [139, 92, 246] },
-        styles: { fontSize: 9 }
+        styles: { fontSize: 9 },
+        margin: { top: 20 },
+        pageBreak: 'auto',
       });
 
       doc.save(`${fileName}.pdf`);

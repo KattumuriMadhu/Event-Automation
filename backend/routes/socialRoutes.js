@@ -31,16 +31,18 @@ router.post(
         });
       }
 
-      event.socialMedia.instagram.status = "SCHEDULED";
-      event.socialMedia.instagram.scheduledAt = new Date(scheduledAt);
-
-      event.approvalTimeline.push({
-        action: "SCHEDULED",
-        by: "ADMIN",
-        at: new Date(),
-      });
-
-      await event.save();
+      await Event.updateOne(
+        { _id: event._id },
+        {
+          $set: {
+            "socialMedia.instagram.status": "SCHEDULED",
+            "socialMedia.instagram.scheduledAt": new Date(scheduledAt)
+          },
+          $push: {
+            approvalTimeline: { action: "SCHEDULED", by: "ADMIN", at: new Date() }
+          }
+        }
+      );
 
       res.json({
         success: true,
@@ -129,27 +131,27 @@ router.post("/instagram/:eventId", authMiddleware, adminMiddleware, async (req, 
           caption,
         });
 
-        // ✅ Save Instagram profile URL for UI
-        event.socialMedia.instagram.postUrl = postUrl ||
-          `https://www.instagram.com/${process.env.INSTAGRAM_USERNAME}/`;
-
-        event.socialMedia.instagram.posted = true;
-        event.socialMedia.instagram.postedAt = new Date();
-        event.socialMedia.instagram.status = "POSTED";
-
-        event.approvalTimeline.push({
-          action: "POSTED",
-          by: "ADMIN",
-          at: new Date(),
-        });
-
-        await event.save();
+        await Event.updateOne(
+          { _id: eventId },
+          {
+            $set: {
+              "socialMedia.instagram.postUrl": postUrl || `https://www.instagram.com/${process.env.INSTAGRAM_USERNAME}/`,
+              "socialMedia.instagram.posted": true,
+              "socialMedia.instagram.postedAt": new Date(),
+              "socialMedia.instagram.status": "POSTED"
+            },
+            $push: {
+              approvalTimeline: { action: "POSTED", by: "ADMIN", at: new Date() }
+            }
+          }
+        );
         console.log("Instagram background publish success:", eventId);
       } catch (bgError) {
         console.error("Instagram background publish failed:", bgError.message);
-        // Optionally update event status to 'FAILED' here
-        event.socialMedia.instagram.status = "FAILED";
-        await event.save().catch(e => console.error(e));
+        await Event.updateOne(
+          { _id: eventId },
+          { $set: { "socialMedia.instagram.status": "FAILED" } }
+        ).catch(e => console.error(e));
       }
     })();
 
@@ -193,16 +195,18 @@ router.post(
         });
       }
 
-      event.socialMedia.facebook.status = "SCHEDULED";
-      event.socialMedia.facebook.scheduledAt = new Date(scheduledAt);
-
-      event.approvalTimeline.push({
-        action: "SCHEDULED_FB",
-        by: "ADMIN",
-        at: new Date(),
-      });
-
-      await event.save();
+      await Event.updateOne(
+        { _id: event._id },
+        {
+          $set: {
+            "socialMedia.facebook.status": "SCHEDULED",
+            "socialMedia.facebook.scheduledAt": new Date(scheduledAt)
+          },
+          $push: {
+            approvalTimeline: { action: "SCHEDULED_FB", by: "ADMIN", at: new Date() }
+          }
+        }
+      );
 
       res.json({
         success: true,
@@ -286,24 +290,27 @@ router.post("/facebook/:eventId", authMiddleware, adminMiddleware, async (req, r
           caption,
         });
 
-        event.socialMedia.facebook.postUrl = postUrl;
-        event.socialMedia.facebook.posted = true;
-        event.socialMedia.facebook.postedAt = new Date();
-        event.socialMedia.facebook.status = "POSTED";
-
-        event.approvalTimeline.push({
-          action: "POSTED_FB",
-          by: "ADMIN",
-          at: new Date(),
-        });
-
-        await event.save();
+        await Event.updateOne(
+          { _id: eventId },
+          {
+            $set: {
+              "socialMedia.facebook.postUrl": postUrl || "",
+              "socialMedia.facebook.posted": true,
+              "socialMedia.facebook.postedAt": new Date(),
+              "socialMedia.facebook.status": "POSTED"
+            },
+            $push: {
+              approvalTimeline: { action: "POSTED_FB", by: "ADMIN", at: new Date() }
+            }
+          }
+        );
         console.log("Facebook background publish success:", eventId);
       } catch (bgError) {
         console.error("Facebook background publish failed:", bgError.message);
-        // Optionally update event status to 'FAILED' here
-        event.socialMedia.facebook.status = "FAILED";
-        await event.save().catch(e => console.error(e));
+        await Event.updateOne(
+          { _id: eventId },
+          { $set: { "socialMedia.facebook.status": "FAILED" } }
+        ).catch(e => console.error(e));
       }
     })();
 

@@ -27,6 +27,8 @@ const formatDateDisplay = (dateStr) => {
 export default function CustomDateTimePicker({ value, onChange }) {
     const [show, setShow] = useState(false);
     const containerRef = useRef(null);
+    const hourColRef = useRef(null);
+    const minColRef = useRef(null);
 
     // Initialize state from props or default
     const initialDate = value ? new Date(value) : new Date();
@@ -44,13 +46,23 @@ export default function CustomDateTimePicker({ value, onChange }) {
     useEffect(() => {
         if (value) {
             const d = new Date(value);
-            setSelectedDate(d);
-            setViewDate(d);
-            setHour(d.getHours() % 12 || 12);
-            setMinute(d.getMinutes());
-            setPeriod(d.getHours() >= 12 ? "PM" : "AM");
+            // Only update internal state if date actually changed to prevent infinite loops
+            if (d.getTime() !== selectedDate.getTime()) {
+                setSelectedDate(d);
+                setViewDate(d);
+                setHour(d.getHours() % 12 || 12);
+                setMinute(d.getMinutes());
+                setPeriod(d.getHours() >= 12 ? "PM" : "AM");
+            }
         }
     }, [value]);
+
+    // When the component opens, if value is empty, update parent with our initial default value immediately
+    useEffect(() => {
+        if (show && !value) {
+            updateParent(selectedDate, hour, minute, period);
+        }
+    }, [show, value]);
 
     // Close on click outside
     useEffect(() => {
@@ -62,6 +74,27 @@ export default function CustomDateTimePicker({ value, onChange }) {
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
+
+    // Scroll active times into view when opened
+    useEffect(() => {
+        if (show) {
+            // Need a slight delay for render
+            setTimeout(() => {
+                if (hourColRef.current) {
+                    const activeHour = hourColRef.current.querySelector(`.${styles.activeTime}`);
+                    if (activeHour) {
+                        activeHour.scrollIntoView({ block: "center" });
+                    }
+                }
+                if (minColRef.current) {
+                    const activeMin = minColRef.current.querySelector(`.${styles.activeTime}`);
+                    if (activeMin) {
+                        activeMin.scrollIntoView({ block: "center" });
+                    }
+                }
+            }, 50);
+        }
+    }, [show]);
 
     /* ================= HANDLERS ================= */
     const updateParent = (newDate, newHour, newMinute, newPeriod) => {
@@ -173,7 +206,7 @@ export default function CustomDateTimePicker({ value, onChange }) {
                         <div className={styles.timeHeader}>Time</div>
                         <div className={styles.timeGrid}>
                             {/* HOURS */}
-                            <div className={styles.column}>
+                            <div className={styles.column} ref={hourColRef}>
                                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
                                     <button
                                         key={h}
@@ -186,7 +219,7 @@ export default function CustomDateTimePicker({ value, onChange }) {
                                 ))}
                             </div>
                             {/* MINUTES (0-59) */}
-                            <div className={styles.column}>
+                            <div className={styles.column} ref={minColRef}>
                                 {Array.from({ length: 60 }, (_, i) => i).map(m => (
                                     <button
                                         key={m}

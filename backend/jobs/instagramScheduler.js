@@ -20,6 +20,14 @@ cron.schedule("*/10 * * * * *", async () => {
     try {
       if (event.socialMedia.instagram.posted) continue; // Safety check
 
+      // Atomically claim this event to prevent double-posting
+      const claimedEvent = await Event.findOneAndUpdate(
+        { _id: event._id, "socialMedia.instagram.status": "SCHEDULED" },
+        { $set: { "socialMedia.instagram.status": "POSTING" } },
+        { new: true }
+      );
+      if (!claimedEvent) continue; // Already picked up by another run
+
       const imageUrls = event.images.slice(0, 10).map((img) =>
         img.startsWith("http") ? img : `${process.env.PUBLIC_URL}${img}`
       );
@@ -30,17 +38,26 @@ cron.schedule("*/10 * * * * *", async () => {
         caption: event.socialMedia.instagram.content || event.details,
       });
 
-      event.socialMedia.instagram.status = "POSTED";
-      event.socialMedia.instagram.posted = true;
-      event.socialMedia.instagram.postedAt = new Date();
-      event.socialMedia.instagram.postUrl = postUrl;
-
-      event.approvalTimeline.push({ action: "AUTO_POST_IG", by: "SYSTEM", at: new Date() });
-      await event.save();
+      await Event.updateOne(
+        { _id: event._id },
+        {
+          $set: {
+            "socialMedia.instagram.status": "POSTED",
+            "socialMedia.instagram.posted": true,
+            "socialMedia.instagram.postedAt": new Date(),
+            "socialMedia.instagram.postUrl": postUrl,
+          },
+          $push: {
+            approvalTimeline: { action: "AUTO_POST_IG", by: "SYSTEM", at: new Date() }
+          }
+        }
+      );
     } catch (err) {
       console.error(`[Scheduler] IG Failed for ${event.title}:`, err.message);
-      event.socialMedia.instagram.status = "FAILED";
-      await event.save();
+      await Event.updateOne(
+        { _id: event._id },
+        { $set: { "socialMedia.instagram.status": "FAILED" } }
+      );
     }
   }
 
@@ -58,6 +75,14 @@ cron.schedule("*/10 * * * * *", async () => {
     try {
       if (event.socialMedia.facebook.posted) continue;
 
+      // Atomically claim this event
+      const claimedFbEvent = await Event.findOneAndUpdate(
+        { _id: event._id, "socialMedia.facebook.status": "SCHEDULED" },
+        { $set: { "socialMedia.facebook.status": "POSTING" } },
+        { new: true }
+      );
+      if (!claimedFbEvent) continue; // Already picked up by another run
+
       const imageUrls = event.images.slice(0, 10).map((img) =>
         img.startsWith("http") ? img : `${process.env.PUBLIC_URL}${img}`
       );
@@ -69,17 +94,26 @@ cron.schedule("*/10 * * * * *", async () => {
         caption: event.socialMedia.facebook.content || event.details,
       });
 
-      event.socialMedia.facebook.status = "POSTED";
-      event.socialMedia.facebook.posted = true;
-      event.socialMedia.facebook.postedAt = new Date();
-      event.socialMedia.facebook.postUrl = postUrl;
-
-      event.approvalTimeline.push({ action: "AUTO_POST_FB", by: "SYSTEM", at: new Date() });
-      await event.save();
+      await Event.updateOne(
+        { _id: event._id },
+        {
+          $set: {
+            "socialMedia.facebook.status": "POSTED",
+            "socialMedia.facebook.posted": true,
+            "socialMedia.facebook.postedAt": new Date(),
+            "socialMedia.facebook.postUrl": postUrl,
+          },
+          $push: {
+            approvalTimeline: { action: "AUTO_POST_FB", by: "SYSTEM", at: new Date() }
+          }
+        }
+      );
     } catch (err) {
       console.error(`[Scheduler] FB Failed for ${event.title}:`, err.message);
-      event.socialMedia.facebook.status = "FAILED";
-      await event.save();
+      await Event.updateOne(
+        { _id: event._id },
+        { $set: { "socialMedia.facebook.status": "FAILED" } }
+      );
     }
   }
 });

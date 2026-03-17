@@ -358,7 +358,7 @@ export default function AdminSocialPostPage() {
           <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '30px', maxWidth: '400px', lineHeight: '1.6' }}>
             We couldn't find the event you're looking for. It may have been removed or the link might be incorrect.
           </p>
-          <button 
+          <button
             style={{
               padding: '14px 32px',
               background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
@@ -386,183 +386,183 @@ export default function AdminSocialPostPage() {
     <div className={styles.page}>
       {!showSuccess && (
         <div className={`${styles.card} ${isClosing ? styles.fadeOut : ""}`}>
-            {/* ================= HEADER ================= */}
-            <header className={styles.header}>
-              <h1>{event.title}</h1>
-          <span className={styles.status}>
-            {published ? "📣 Published" : "✔ Approved"}
-          </span>
-        </header>
+          {/* ================= HEADER ================= */}
+          <header className={styles.header}>
+            <h1>{event.title}</h1>
+            <span className={styles.status}>
+              {published ? "📣 Published" : "✔ Approved"}
+            </span>
+          </header>
 
-        {/* ================= EVENT DETAILS ================= */}
-        <section className={styles.meta}>
-          <div>
-            <label>Department</label>
-            <span>{event.department}</span>
-          </div>
-
-          <div>
-            <label>Event Type</label>
-            <span>{event.type}</span>
-          </div>
-
-          <div>
-            <label>Date{event.dates && event.dates.length > 1 ? 's' : ''}</label>
-            <span>{event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : (event.date ? new Date(event.date).toDateString() : 'TBA')}</span>
-          </div>
-
-          <div>
-            <label>Audience</label>
-            <span>{event.audience}</span>
-          </div>
-
-          <div>
-            <label>Resource Person</label>
-            <span>{event.resourcePerson}</span>
-          </div>
-        </section>
-
-        <section className={styles.section}>
-          <h2>Event Description</h2>
-          <p>{event.details || "No description provided."}</p>
-        </section>
-
-        {event.images?.length > 0 && (
-          <div className={styles.images}>
-            {event.images.map((img, i) => (
-              img ? (
-                <img
-                  key={i}
-                  src={img.startsWith?.("http") ? img : `${API_BASE_URL}${img}`}
-                  alt="Event"
-                  className={styles.image}
-                />
-              ) : null
-            ))}
-          </div>
-        )}
-
-        {/* ================= PUBLISH PANEL ================= */}
-        {!published && (
-          <section className={styles.publish}>
-            <h2>Publish on Official Platforms</h2>
-
-            <div className={styles.mode}>
-              <label>
-                <input
-                  type="radio"
-                  checked={mode === "NOW"}
-                  onChange={() => setMode("NOW")}
-                />
-                Publish Now
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  checked={mode === "SCHEDULE"}
-                  onChange={() => setMode("SCHEDULE")}
-                />
-                Schedule for later
-              </label>
+          {/* ================= EVENT DETAILS ================= */}
+          <section className={styles.meta}>
+            <div>
+              <label>Department</label>
+              <span>{event.department}</span>
             </div>
-            {mode === "SCHEDULE" && (
-              <div className={styles.scheduleRow}>
-                <div className={styles.dateWrapper}>
-                  <CustomDateTimePicker
-                    value={scheduleTime}
-                    onChange={(e) => setScheduleTime(e.target.value)}
+
+            <div>
+              <label>Event Type</label>
+              <span>{event.type}</span>
+            </div>
+
+            <div>
+              <label>Date{event.dates && event.dates.length > 1 ? 's' : ''}</label>
+              <span>{event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : (event.date ? new Date(event.date).toDateString() : 'TBA')}</span>
+            </div>
+
+            <div>
+              <label>Audience</label>
+              <span>{event.audience}</span>
+            </div>
+
+            <div>
+              <label>Resource Person</label>
+              <span>{event.resourcePerson}</span>
+            </div>
+          </section>
+
+          <section className={styles.section}>
+            <h2>Event Description</h2>
+            <p>{event.details || "No description provided."}</p>
+          </section>
+
+          {event.images?.length > 0 && (
+            <div className={styles.images}>
+              {event.images.map((img, i) => (
+                img ? (
+                  <img
+                    key={i}
+                    src={img.startsWith?.("http") ? img : `${API_BASE_URL}${img}`}
+                    alt="Event"
+                    className={styles.image}
                   />
-                </div>
+                ) : null
+              ))}
+            </div>
+          )}
 
+          {/* ================= PUBLISH PANEL ================= */}
+          {!published && (
+            <section className={styles.publish}>
+              <h2>Publish on Official Platforms</h2>
+
+              <div className={styles.mode}>
+                <label>
+                  <input
+                    type="radio"
+                    checked={mode === "NOW"}
+                    onChange={() => setMode("NOW")}
+                  />
+                  Publish Now
+                </label>
+
+                <label>
+                  <input
+                    type="radio"
+                    checked={mode === "SCHEDULE"}
+                    onChange={() => setMode("SCHEDULE")}
+                  />
+                  Schedule for later
+                </label>
               </div>
-            )}
+              {mode === "SCHEDULE" && (
+                <div className={styles.scheduleRow}>
+                  <div className={styles.dateWrapper}>
+                    <CustomDateTimePicker
+                      value={scheduleTime}
+                      onChange={(e) => setScheduleTime(e.target.value)}
+                    />
+                  </div>
+
+                </div>
+              )}
 
 
-            <div className={styles.platforms}>
-              {/* INSTAGRAM CARD */}
-              <label
-                className={`
+              <div className={styles.platforms}>
+                {/* INSTAGRAM CARD */}
+                <label
+                  className={`
                   ${styles.platformCard} 
                   ${selectedPlatforms.includes("instagram") && !event?.socialMedia?.instagram?.posted && event?.socialMedia?.instagram?.status !== 'SCHEDULED' ? styles.platformActive : ""}
                   ${event?.socialMedia?.instagram?.posted ? styles.platformPosted : ""}
                   ${event?.socialMedia?.instagram?.status === 'SCHEDULED' ? styles.platformScheduled : ""}
                 `}
-                onClick={() => !event?.socialMedia?.instagram?.posted && event?.socialMedia?.instagram?.status !== 'SCHEDULED' && togglePlatform("instagram")}
-              >
-                <div className={`${styles.platformIcon} ${styles.igIcon}`}><FaInstagram /></div>
-                <div className={styles.platformInfo}>
-                  <span className={styles.platformName}>Instagram</span>
-                  {event?.socialMedia?.instagram?.posted ? (
-                    <span className={styles.postedLabel}>✔ Published</span>
-                  ) : event?.socialMedia?.instagram?.status === 'SCHEDULED' ? (
-                    <span className={styles.scheduledLabel}>⏰ Scheduled</span>
-                  ) : (
-                    selectedPlatforms.includes("instagram") && <span className={styles.checkIcon}>✔</span>
-                  )}
-                </div>
-              </label>
+                  onClick={() => !event?.socialMedia?.instagram?.posted && event?.socialMedia?.instagram?.status !== 'SCHEDULED' && togglePlatform("instagram")}
+                >
+                  <div className={`${styles.platformIcon} ${styles.igIcon}`}><FaInstagram /></div>
+                  <div className={styles.platformInfo}>
+                    <span className={styles.platformName}>Instagram</span>
+                    {event?.socialMedia?.instagram?.posted ? (
+                      <span className={styles.postedLabel}>✔ Published</span>
+                    ) : event?.socialMedia?.instagram?.status === 'SCHEDULED' ? (
+                      <span className={styles.scheduledLabel}>⏰ Scheduled</span>
+                    ) : (
+                      selectedPlatforms.includes("instagram") && <span className={styles.checkIcon}>✔</span>
+                    )}
+                  </div>
+                </label>
 
-              {/* FACEBOOK CARD */}
-              <label
-                className={`
+                {/* FACEBOOK CARD */}
+                <label
+                  className={`
                   ${styles.platformCard} 
                   ${selectedPlatforms.includes("facebook") && !event?.socialMedia?.facebook?.posted && event?.socialMedia?.facebook?.status !== 'SCHEDULED' ? styles.platformActive : ""}
                   ${event?.socialMedia?.facebook?.posted ? styles.platformPosted : ""}
                   ${event?.socialMedia?.facebook?.status === 'SCHEDULED' ? styles.platformScheduled : ""}
                 `}
-                onClick={() => !event?.socialMedia?.facebook?.posted && event?.socialMedia?.facebook?.status !== 'SCHEDULED' && togglePlatform("facebook")}
-              >
-                <div className={`${styles.platformIcon} ${styles.fbIcon}`}><FaFacebook /></div>
-                <div className={styles.platformInfo}>
-                  <span className={styles.platformName}>Facebook</span>
-                  {event?.socialMedia?.facebook?.posted ? (
-                    <span className={styles.postedLabel}>✔ Published</span>
-                  ) : event?.socialMedia?.facebook?.status === 'SCHEDULED' ? (
-                    <span className={styles.scheduledLabel}>⏰ Scheduled</span>
-                  ) : (
-                    selectedPlatforms.includes("facebook") && <span className={styles.checkIcon}>✔</span>
-                  )}
-                </div>
-              </label>
-            </div>
-
-            <button
-              className={styles.publishBtn}
-              onClick={publish}
-              disabled={posting}
-            >
-              {posting
-                ? "Processing..."
-                : mode === "SCHEDULE"
-                  ? "Schedule Post"
-                  : "Publish Post"}
-            </button>
-          </section>
-        )}
-      </div>
-    )}
-
-        {showSuccess && (
-          <div className={styles.inlineSuccess}>
-            <div className={styles.inlineSuccessCard}>
-              <div className={styles.icon}>✔</div>
-              <div>
-                <h3>{mode === "SCHEDULE" ? "Event Scheduled Successfully" : "Event Published Successfully"}</h3>
-                <p className={styles.successMeta}>
-                  <strong>{event.title}</strong>
-                </p>
-                <p className={styles.successSub}>
-                  {selectedPlatforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(" & ")} • {new Date().toLocaleString()}
-                </p>
-                <span className={styles.badge}>{mode === "SCHEDULE" ? "SCHEDULED" : "PUBLISHED"}</span>
-                <p className={styles.redirectText}>
-                  This page will close automatically…
-                </p>
+                  onClick={() => !event?.socialMedia?.facebook?.posted && event?.socialMedia?.facebook?.status !== 'SCHEDULED' && togglePlatform("facebook")}
+                >
+                  <div className={`${styles.platformIcon} ${styles.fbIcon}`}><FaFacebook /></div>
+                  <div className={styles.platformInfo}>
+                    <span className={styles.platformName}>Facebook</span>
+                    {event?.socialMedia?.facebook?.posted ? (
+                      <span className={styles.postedLabel}>✔ Published</span>
+                    ) : event?.socialMedia?.facebook?.status === 'SCHEDULED' ? (
+                      <span className={styles.scheduledLabel}>⏰ Scheduled</span>
+                    ) : (
+                      selectedPlatforms.includes("facebook") && <span className={styles.checkIcon}>✔</span>
+                    )}
+                  </div>
+                </label>
               </div>
+
+              <button
+                className={styles.publishBtn}
+                onClick={publish}
+                disabled={posting}
+              >
+                {posting
+                  ? "Processing..."
+                  : mode === "SCHEDULE"
+                    ? "Schedule Post"
+                    : "Publish Post"}
+              </button>
+            </section>
+          )}
+        </div>
+      )}
+
+      {showSuccess && (
+        <div className={styles.inlineSuccess}>
+          <div className={styles.inlineSuccessCard}>
+            <div className={styles.icon}>✔</div>
+            <div>
+              <h3>{mode === "SCHEDULE" ? "Event Scheduled Successfully" : "Event Published Successfully"}</h3>
+              <p className={styles.successMeta}>
+                <strong>{event.title}</strong>
+              </p>
+              <p className={styles.successSub}>
+                {selectedPlatforms.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(" & ")} • {new Date().toLocaleString()}
+              </p>
+              <span className={styles.badge}>{mode === "SCHEDULE" ? "SCHEDULED" : "PUBLISHED"}</span>
+              <p className={styles.redirectText}>
+                This page will close automatically…
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div >
   );
 }
