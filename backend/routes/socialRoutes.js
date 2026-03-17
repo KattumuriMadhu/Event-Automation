@@ -117,43 +117,43 @@ router.post("/instagram/:eventId", authMiddleware, adminMiddleware, async (req, 
       });
     }
 
-    // ================= FIRE AND FORGET ================= 
-    res.json({
-      success: true,
-      message: "Publishing to Instagram started in the background",
-    });
+    try {
+      const { postUrl } = await postToInstagram({
+        imageUrls,
+        caption,
+      });
 
-    // Run actual publishing asynchronously
-    (async () => {
-      try {
-        const { postUrl } = await postToInstagram({
-          imageUrls,
-          caption,
-        });
-
-        await Event.updateOne(
-          { _id: eventId },
-          {
-            $set: {
-              "socialMedia.instagram.postUrl": postUrl || `https://www.instagram.com/${process.env.INSTAGRAM_USERNAME}/`,
-              "socialMedia.instagram.posted": true,
-              "socialMedia.instagram.postedAt": new Date(),
-              "socialMedia.instagram.status": "POSTED"
-            },
-            $push: {
-              approvalTimeline: { action: "POSTED", by: "ADMIN", at: new Date() }
-            }
+      await Event.updateOne(
+        { _id: eventId },
+        {
+          $set: {
+            "socialMedia.instagram.postUrl": postUrl || `https://www.instagram.com/${process.env.INSTAGRAM_USERNAME}/`,
+            "socialMedia.instagram.posted": true,
+            "socialMedia.instagram.postedAt": new Date(),
+            "socialMedia.instagram.status": "POSTED"
+          },
+          $push: {
+            approvalTimeline: { action: "POSTED", by: "ADMIN", at: new Date() }
           }
-        );
-        console.log("Instagram background publish success:", eventId);
-      } catch (bgError) {
-        console.error("Instagram background publish failed:", bgError.message);
-        await Event.updateOne(
-          { _id: eventId },
-          { $set: { "socialMedia.instagram.status": "FAILED" } }
-        ).catch(e => console.error(e));
-      }
-    })();
+        }
+      );
+      console.log("Instagram publish success:", eventId);
+      
+      res.json({
+        success: true,
+        message: "Successfully published to Instagram",
+      });
+    } catch (publishError) {
+      console.error("Instagram publish failed:", publishError.message);
+      await Event.updateOne(
+        { _id: eventId },
+        { $set: { "socialMedia.instagram.status": "FAILED" } }
+      ).catch(e => console.error(e));
+      
+      return res.status(500).json({
+        message: "Failed to publish to Instagram: " + publishError.message,
+      });
+    }
 
   } catch (error) {
     console.error(
@@ -276,43 +276,43 @@ router.post("/facebook/:eventId", authMiddleware, adminMiddleware, async (req, r
       });
     }
 
-    // ================= FIRE AND FORGET ================= 
-    res.json({
-      success: true,
-      message: "Publishing to Facebook started in the background",
-    });
+    try {
+      const { postUrl } = await postToFacebook({
+        imageUrls,
+        caption,
+      });
 
-    // Run actual publishing asynchronously
-    (async () => {
-      try {
-        const { postUrl } = await postToFacebook({
-          imageUrls,
-          caption,
-        });
-
-        await Event.updateOne(
-          { _id: eventId },
-          {
-            $set: {
-              "socialMedia.facebook.postUrl": postUrl || "",
-              "socialMedia.facebook.posted": true,
-              "socialMedia.facebook.postedAt": new Date(),
-              "socialMedia.facebook.status": "POSTED"
-            },
-            $push: {
-              approvalTimeline: { action: "POSTED_FB", by: "ADMIN", at: new Date() }
-            }
+      await Event.updateOne(
+        { _id: eventId },
+        {
+          $set: {
+            "socialMedia.facebook.postUrl": postUrl || "",
+            "socialMedia.facebook.posted": true,
+            "socialMedia.facebook.postedAt": new Date(),
+            "socialMedia.facebook.status": "POSTED"
+          },
+          $push: {
+            approvalTimeline: { action: "POSTED_FB", by: "ADMIN", at: new Date() }
           }
-        );
-        console.log("Facebook background publish success:", eventId);
-      } catch (bgError) {
-        console.error("Facebook background publish failed:", bgError.message);
-        await Event.updateOne(
-          { _id: eventId },
-          { $set: { "socialMedia.facebook.status": "FAILED" } }
-        ).catch(e => console.error(e));
-      }
-    })();
+        }
+      );
+      console.log("Facebook publish success:", eventId);
+      
+      res.json({
+        success: true,
+        message: "Successfully published to Facebook",
+      });
+    } catch (publishError) {
+      console.error("Facebook publish failed:", publishError.message);
+      await Event.updateOne(
+        { _id: eventId },
+        { $set: { "socialMedia.facebook.status": "FAILED" } }
+      ).catch(e => console.error(e));
+      
+      return res.status(500).json({
+        message: "Failed to publish to Facebook: " + publishError.message,
+      });
+    }
 
   } catch (error) {
     console.error(
