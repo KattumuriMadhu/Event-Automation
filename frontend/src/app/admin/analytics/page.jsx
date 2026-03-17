@@ -97,7 +97,9 @@ export default function AnalyticsPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        setEvents(data);
+        // User requested to ONLY show published events in Analytics (charts, exports, calendar)
+        const publishedEvents = data.filter(e => e.socialMedia?.instagram?.posted || e.socialMedia?.facebook?.posted);
+        setEvents(publishedEvents);
       } else {
         setServerError(true);
       }
