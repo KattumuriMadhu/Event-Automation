@@ -29,7 +29,10 @@ export default function CoordinatorApprovalPage() {
       fetch(`${API_BASE_URL}/api/approval/event/${id}`)
         .then(async (res) => {
           if (!res.ok) {
-            throw new Error("Failed to fetch event");
+            if (res.status === 404) {
+              return null; // Return null instead of throwing error
+            }
+            throw new Error(`HTTP Error: ${res.status}`);
           }
           const text = await res.text();
           return text ? JSON.parse(text) : null;
@@ -38,8 +41,10 @@ export default function CoordinatorApprovalPage() {
           setEvent(data);
           setServerError(false);
 
-          if (data.approvalStatus === "APPROVED") setStatus("APPROVED");
-          if (data.approvalStatus === "REJECTED") setStatus("REJECTED");
+          if (data) {
+            if (data.approvalStatus === "APPROVED") setStatus("APPROVED");
+            if (data.approvalStatus === "REJECTED") setStatus("REJECTED");
+          }
 
           setLoading(false);
         })

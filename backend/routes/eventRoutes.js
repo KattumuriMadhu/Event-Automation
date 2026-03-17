@@ -68,22 +68,31 @@ router.post(
         });
       }
 
-      /* ================= UPLOAD IMAGES TO CLOUDINARY ================= */
-      const imagePaths = [];
+      /* ================= UPLOAD IMAGES TO CLOUDINARY (PARALLEL) ================= */
+      const uploadPromises = req.files.map(async (file) => {
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder: "event_automation",
+            resource_type: "image",
+          });
 
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "event_automation",
-          resource_type: "image",
-        });
+          // remove local file after upload
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
 
-        imagePaths.push(result.secure_url);
-
-        // remove local file after upload
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
+          return result.secure_url;
+        } catch (uploadError) {
+          console.error("Error uploading image to Cloudinary:", uploadError);
+          // attempt to cleanup
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+          throw uploadError;
         }
-      }
+      });
+
+      const imagePaths = await Promise.all(uploadPromises);
 
       /* ================= CREATE EVENT (FAST) ================= */
       const baseEventData = {
