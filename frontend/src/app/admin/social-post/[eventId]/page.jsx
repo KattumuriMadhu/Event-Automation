@@ -23,6 +23,7 @@ export default function AdminSocialPostPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState([]);
   const [published, setPublished] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
   const togglePlatform = (p) => {
     if (selectedPlatforms.includes(p)) {
@@ -136,6 +137,7 @@ export default function AdminSocialPostPage() {
         setLoading(false);
       } catch {
         setEvent(null);
+        setServerError(true);
         setLoading(false);
       }
     };
@@ -309,6 +311,32 @@ export default function AdminSocialPostPage() {
 
   /* ================= UI STATES ================= */
   if (loading) return <p className={styles.loading}>Loading…</p>;
+  if (serverError) {
+    return (
+      <div className={styles.page}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+          <h2 style={{ color: '#ef4444', fontSize: '2rem', marginBottom: '1rem' }}>⚠</h2>
+          <h2>Cannot Connect to Server</h2>
+          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+          <button
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+            onClick={() => window.location.reload()}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (!event) return <p className={styles.loading}>Event not found</p>;
 
   return (
@@ -337,7 +365,7 @@ export default function AdminSocialPostPage() {
 
           <div>
             <label>Date{event.dates && event.dates.length > 1 ? 's' : ''}</label>
-            <span>{event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}</span>
+            <span>{event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : (event.date ? new Date(event.date).toDateString() : 'TBA')}</span>
           </div>
 
           <div>

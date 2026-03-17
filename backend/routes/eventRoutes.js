@@ -33,7 +33,7 @@ router.post(
         parsedDates = [date];
       }
 
-      if (!title || parsedDates.length === 0 || !type || !details || !department) {
+      if (!title || !type || !details || !department) {
         return res.status(400).json({
           message: "Please fill all required details",
         });

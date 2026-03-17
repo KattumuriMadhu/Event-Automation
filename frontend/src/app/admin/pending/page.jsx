@@ -15,6 +15,7 @@ export default function PendingApprovalsPage() {
     const [user, setUser] = useState(null);
     const [pendingEvents, setPendingEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [serverError, setServerError] = useState(false);
 
     const [viewingEvent, setViewingEvent] = useState(null);
     const [rejectingId, setRejectingId] = useState(null);
@@ -53,9 +54,11 @@ export default function PendingApprovalsPage() {
                 const pending = data.filter((e) => e.approvalStatus === "SENT");
                 setPendingEvents(pending);
             } else {
+                setServerError(true);
                 toast.error("Failed to load events");
             }
         } catch (error) {
+            setServerError(true);
             toast.error("Error communicating with server");
         } finally {
             setLoading(false);
@@ -142,6 +145,33 @@ export default function PendingApprovalsPage() {
         return <div className={styles.loaderArea}>Loading pending approvals...</div>;
     }
 
+    if (serverError) {
+        return (
+            <div className={styles.page}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+                    <h2 style={{ color: '#ef4444', fontSize: '2rem', marginBottom: '1rem' }}>⚠</h2>
+                    <h2>Cannot Connect to Server</h2>
+                    <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+                    <button
+                        style={{
+                            marginTop: '20px',
+                            padding: '10px 20px',
+                            background: '#8b5cf6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '500'
+                        }}
+                        onClick={() => window.location.reload()}
+                    >
+                        Retry Connection
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.page}>
             <header className={styles.header}>
@@ -187,11 +217,11 @@ export default function PendingApprovalsPage() {
                                         </td>
                                         <td>
                                             <div className={styles.dateText}>
-                                                {new Date(e.date).toLocaleDateString(undefined, {
+                                                {e.date ? new Date(e.date).toLocaleDateString(undefined, {
                                                     month: 'short',
                                                     day: 'numeric',
                                                     year: 'numeric'
-                                                })}
+                                                }) : "TBA"}
                                             </div>
                                         </td>
                                         <td>
@@ -283,10 +313,12 @@ export default function PendingApprovalsPage() {
                             ) : (
                                 <div className={styles.placeholderCover} />
                             )}
-                            <div className={styles.dateBadge}>
-                                <span className={styles.day}>{new Date(viewingEvent.date).getDate()}</span>
-                                <span className={styles.month}>{new Date(viewingEvent.date).toLocaleString('default', { month: 'short' }).toUpperCase()}</span>
-                            </div>
+                            {viewingEvent.date && (
+                                <div className={styles.dateBadge}>
+                                    <span className={styles.day}>{new Date(viewingEvent.date).getDate()}</span>
+                                    <span className={styles.month}>{new Date(viewingEvent.date).toLocaleString('default', { month: 'short' }).toUpperCase()}</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.cardContent}>
@@ -310,12 +342,12 @@ export default function PendingApprovalsPage() {
                                 <div className={styles.metaItem}>
                                     <span className={styles.label}>Date</span>
                                     <span className={styles.value}>
-                                        {new Date(viewingEvent.date).toLocaleDateString(undefined, {
+                                        {viewingEvent.date ? new Date(viewingEvent.date).toLocaleDateString(undefined, {
                                             weekday: 'long',
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric'
-                                        })}
+                                        }) : "TBA"}
                                     </span>
                                 </div>
                             </div>

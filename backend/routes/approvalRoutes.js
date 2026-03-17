@@ -150,12 +150,12 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
                               Event Date
                             </div>
                             <div style="color:#1e293b;font-size:15px;font-weight:500">
-                              ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })).join('<br/>') : new Date(event.date).toLocaleDateString('en-US', {
+                              ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })).join('<br/>') : (event.date ? new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'short',
         year: 'numeric',
         month: 'short',
         day: 'numeric'
-      })}
+      }) : 'TBA')}
                             </div>
                           </div>
                         </td>
@@ -474,12 +474,12 @@ router.post("/approve/:id", async (req, res) => {
                                   Event Date
                                 </div>
                                 <div style="color:#1e293b;font-size:15px;font-weight:600">
-                                  ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })).join('<br/>') : new Date(event.date).toLocaleDateString('en-US', {
+                                  ${event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })).join('<br/>') : (event.date ? new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'short',
         month: 'short',
         day: 'numeric',
         year: 'numeric'
-      })}
+      }) : 'TBA')}
                                 </div>
                               </td>
                             </tr>

@@ -13,6 +13,7 @@ export default function AdminUsersPage() {
     const [user, setUser] = useState(null);
     const [usersList, setUsersList] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [serverError, setServerError] = useState(false);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
@@ -36,10 +37,10 @@ export default function AdminUsersPage() {
                     const data = await response.json();
                     setUsersList(data);
                 } else {
-                    toast.error("Failed to load users");
+                    setServerError(true);
                 }
             } catch (error) {
-                toast.error("Error communicating with server");
+                setServerError(true);
             } finally {
                 setLoading(false);
             }
@@ -106,6 +107,33 @@ export default function AdminUsersPage() {
 
     if (loading) {
         return <div className={styles.loaderArea}>Loading users...</div>;
+    }
+
+    if (serverError) {
+        return (
+            <div className={styles.page}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+                    <h2 style={{ color: '#ef4444', fontSize: '2rem', marginBottom: '1rem' }}>⚠</h2>
+                    <h2>Cannot Connect to Server</h2>
+                    <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+                    <button
+                        style={{
+                            marginTop: '20px',
+                            padding: '10px 20px',
+                            background: '#8b5cf6',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            cursor: 'pointer',
+                            fontWeight: '500'
+                        }}
+                        onClick={() => window.location.reload()}
+                    >
+                        Retry Connection
+                    </button>
+                </div>
+            </div>
+        );
     }
 
     return (

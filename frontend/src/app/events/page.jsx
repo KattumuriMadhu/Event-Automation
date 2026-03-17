@@ -24,6 +24,7 @@ export default function EventsPage() {
   const [deletingId, setDeletingId] = useState(null);
   const [deletingIds, setDeletingIds] = useState(new Set()); // Track IDs animating out
   const [loading, setLoading] = useState(true);
+  const [serverError, setServerError] = useState(false);
 
   const [showEmailModal, setShowEmailModal] = useState(false);
 
@@ -108,13 +109,17 @@ export default function EventsPage() {
           if (data) {
             if (Array.isArray(data)) setEvents(data);
             setLoading(false);
+            setServerError(false);
             // Success! Reveal the UI
             setIsCheckingAuth(false);
           }
         })
-        .catch(() => {
-          // Network/Server error -> Redirect to login to be safe/clean
-          window.location.href = "/login";
+        .catch((err) => {
+          // Network/Server error -> Do not redirect to login to allow survival of server restarts
+          console.error("Network error during events fetch:", err);
+          setIsCheckingAuth(false);
+          setLoading(false);
+          setServerError(true);
         });
     };
 
@@ -276,6 +281,33 @@ export default function EventsPage() {
     return <div style={{ position: 'fixed', inset: 0, background: 'white', zIndex: 2147483647 }} />;
   }
 
+  if (serverError) {
+    return (
+      <div className={styles.page}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+          <XCircle size={48} color="#ef4444" style={{ marginBottom: '1rem' }} />
+          <h2>Cannot Connect to Server</h2>
+          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+          <button
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+            onClick={() => window.location.reload()}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       {isUpdating && <Loader />}
@@ -404,10 +436,12 @@ export default function EventsPage() {
                 <div className={styles.placeholderCover} />
               )}
 
-              <div className={styles.dateBadge}>
-                <span className={styles.day}>{new Date(event.date).getDate()}</span>
-                <span className={styles.month}>{new Date(event.date).toLocaleString('default', { month: 'short' }).toUpperCase()}</span>
-              </div>
+              {event.date && (
+                <div className={styles.dateBadge}>
+                  <span className={styles.day}>{new Date(event.date).getDate()}</span>
+                  <span className={styles.month}>{new Date(event.date).toLocaleString('default', { month: 'short' }).toUpperCase()}</span>
+                </div>
+              )}
 
               {/* STATUS BADGE OVERLAY */}
               <div className={styles.statusOverlay}>
@@ -486,7 +520,8 @@ export default function EventsPage() {
                     if (otherEvent._id === event._id) return false;
 
                     const titleMatch = otherEvent.title.toLowerCase().trim() === event.title.toLowerCase().trim();
-                    const dateMatch = new Date(otherEvent.date).toDateString() === new Date(event.date).toDateString();
+                    const dateMatch = (!otherEvent.date && !event.date) || 
+                                      (otherEvent.date && event.date && new Date(otherEvent.date).toDateString() === new Date(event.date).toDateString());
 
                     const statusMatch = ["SENT", "APPROVED"].includes(otherEvent.approvalStatus) ||
                       otherEvent.socialMedia?.instagram?.posted ||
@@ -642,10 +677,12 @@ export default function EventsPage() {
               ) : (
                 <div className={styles.placeholderCover} />
               )}
-              <div className={styles.dateBadge}>
-                <span className={styles.day}>{new Date(activeEvent.date).getDate()}</span>
-                <span className={styles.month}>{new Date(activeEvent.date).toLocaleString('default', { month: 'short' }).toUpperCase()}</span>
-              </div>
+              {activeEvent.date && (
+                <div className={styles.dateBadge}>
+                  <span className={styles.day}>{new Date(activeEvent.date).getDate()}</span>
+                  <span className={styles.month}>{new Date(activeEvent.date).toLocaleString('default', { month: 'short' }).toUpperCase()}</span>
+                </div>
+              )}
             </div>
 
             <div className={styles.cardContent}>
@@ -671,12 +708,12 @@ export default function EventsPage() {
                   <span className={styles.value}>
                     {activeEvent.dates && activeEvent.dates.length > 1
                       ? activeEvent.dates.map(d => new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })).join(', ')
-                      : new Date(activeEvent.date).toLocaleDateString(undefined, {
+                      : activeEvent.date ? new Date(activeEvent.date).toLocaleDateString(undefined, {
                           weekday: 'long',
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
-                        })
+                        }) : "TBA"
                     }
                   </span>
                 </div>

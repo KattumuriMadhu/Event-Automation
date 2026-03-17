@@ -116,7 +116,7 @@ export default function AnalyticsPage() {
        if (e.dates && e.dates.length > 0) {
            return e.dates.some(d => new Date(d).toDateString() === selectedDateString);
        }
-       return new Date(e.date).toDateString() === selectedDateString;
+       return e.date ? new Date(e.date).toDateString() === selectedDateString : false;
     });
     setDayEvents(filtered);
   }, [selectedDate, events]);
@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
     // Filter events by selected date range
     const filteredEvents = events.filter(e => {
       // Check if ANY of the dates fall in range
-      const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : [e.date];
+      const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : (e.date ? [e.date] : []);
       
       return datesToCheck.some(d => {
           const eDate = new Date(d);
@@ -211,7 +211,7 @@ export default function AnalyticsPage() {
       const isPosted = e.socialMedia?.instagram?.posted || e.socialMedia?.facebook?.posted;
       return [
         e.title || '',
-        e.dates && e.dates.length > 0 ? e.dates.map(d => new Date(d).toLocaleDateString()).join(", ") : new Date(e.date).toLocaleDateString(),
+        e.dates && e.dates.length > 0 ? e.dates.map(d => new Date(d).toLocaleDateString()).join(", ") : (e.date ? new Date(e.date).toLocaleDateString() : 'TBA'),
         e.department || '',
         e.audience || '',
         e.type || '',
@@ -267,6 +267,7 @@ export default function AnalyticsPage() {
 
   events.forEach((e) => {
     // For trends we just use the first date or primary date so we don't skew the total count with multi-day events
+    if (!e.date) return;
     const eDate = new Date(e.date);
     const mKey = `${monthNames[eDate.getMonth()]} ${eDate.getFullYear()}`;
     if (monthsDataMap[mKey] !== undefined) {
@@ -318,7 +319,7 @@ export default function AnalyticsPage() {
 
   const hasEventOnDate = (day) => {
     return events.some((e) => {
-      const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : [e.date];
+      const datesToCheck = e.dates && e.dates.length > 0 ? e.dates : (e.date ? [e.date] : []);
       return datesToCheck.some(d => {
           const eDate = new Date(d);
           return (
@@ -366,6 +367,7 @@ export default function AnalyticsPage() {
                   <CustomDatePicker
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
+                    placeholder="Select Start Date"
                   />
                 </div>
               </div>
@@ -375,6 +377,7 @@ export default function AnalyticsPage() {
                   <CustomDatePicker
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
+                    placeholder="Select End Date"
                   />
                 </div>
               </div>

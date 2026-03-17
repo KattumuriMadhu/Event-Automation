@@ -64,6 +64,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
+  const [serverError, setServerError] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -135,13 +136,17 @@ export default function Dashboard() {
             logoutUser();
             window.location.href = "/login";
           } else {
-            // 500 or other errors - treat as auth fail
-            window.location.href = "/login";
+            // 500 or other errors
+            console.error("Server error during auth check:", res.status);
+            setIsCheckingAuth(false);
+            setServerError(true);
           }
         })
-        .catch(() => {
-          // Network error - treat as auth fail
-          window.location.href = "/login";
+        .catch((err) => {
+          // Network error - do not redirect to prevent kicking out during server restarts
+          console.error("Network error during auth check:", err);
+          setIsCheckingAuth(false);
+          setServerError(true);
         });
     };
 
@@ -242,7 +247,7 @@ export default function Dashboard() {
     setSubmitting(true);
 
     /* ================= VALIDATION ================= */
-    if (!formData.title || !formData.type || !formData.department || formData.dates.length === 0 || !formData.details || !formData.audience) {
+    if (!formData.title || !formData.type || !formData.department || !formData.details || !formData.audience) {
       setFormError("⚠️ Please fill all required details");
       toast.error("Please fill all required details");
       setSubmitting(false);
@@ -402,6 +407,33 @@ export default function Dashboard() {
     return <div style={{ position: 'fixed', inset: 0, background: 'white', zIndex: 2147483647 }} />;
   }
 
+  if (serverError) {
+    return (
+      <div className={styles.page}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+          <FaExclamationTriangle size={48} color="#ef4444" style={{ marginBottom: '1rem' }} />
+          <h2>Cannot Connect to Server</h2>
+          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
+          <button
+            style={{
+              marginTop: '20px',
+              padding: '10px 20px',
+              background: '#8b5cf6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontWeight: '500'
+            }}
+            onClick={() => window.location.reload()}
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.page}>
       {(submitting || loadingAI) && <Loader />}
@@ -463,6 +495,7 @@ export default function Dashboard() {
                   <option>Workshop</option>
                   <option>Seminar</option>
                   <option>Hackathon</option>
+                  <option>Tech Fest</option>
                   <option>Guest Lecture</option>
                   <option>Conference</option>
                   <option>Culturals</option>
@@ -499,6 +532,7 @@ export default function Dashboard() {
               <option>EEE</option>
               <option>MECH</option>
               <option>CIVIL</option>
+              <option>MBA</option>
             </select>
 
             {/* <input type="date" name="date" value={formData.date} onChange={handleChange} required /> */}

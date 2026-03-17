@@ -10,7 +10,7 @@ const MONTHS = [
     "July", "August", "September", "October", "November", "December"
 ];
 
-export default function CustomDatePicker({ value, onChange, isMulti = false }) {
+export default function CustomDatePicker({ value, onChange, isMulti = false, placeholder }) {
     const [show, setShow] = useState(false);
     const containerRef = useRef(null);
     const [isMultiEnabled, setIsMultiEnabled] = useState(false);
@@ -141,7 +141,7 @@ export default function CustomDatePicker({ value, onChange, isMulti = false }) {
                 <input
                     readOnly
                     value={getDisplayText()}
-                    placeholder={isMulti ? "Select Event Dates" : "Select Event Date"}
+                    placeholder={placeholder || (isMulti ? "Select Event Dates (Optional)" : "Select Event Date (Optional)")}
                     className={`${styles.dateInput} ${(!value || (isMulti && value.length === 0)) ? styles.placeholder : ''}`}
                 />
                 <CalendarIcon size={18} className={styles.calendarIcon} />
