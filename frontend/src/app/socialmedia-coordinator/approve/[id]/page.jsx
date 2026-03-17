@@ -162,10 +162,32 @@ export default function CoordinatorApprovalPage() {
   if (!event) {
     return (
       <div className={styles.page}>
-        <div className={styles.container}>
-          <h2>Event not found</h2>
-          <button className={styles.approve} onClick={() => router.push("/")}>
-            Go Home
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+          <div className={styles.failureIcon} style={{ background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', color: '#64748b', boxShadow: '0 10px 20px rgba(100, 116, 139, 0.2)' }}>
+            <span style={{ fontSize: '36px' }}>🔍</span>
+          </div>
+          <h2 style={{ fontSize: '2rem', color: '#1e293b', marginBottom: '10px', fontWeight: '700' }}>Event Not Found</h2>
+          <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '30px', maxWidth: '400px', lineHeight: '1.6' }}>
+            We couldn't find the event you're looking for. It may have been removed or the link might be incorrect.
+          </p>
+          <button 
+            style={{
+              padding: '14px 32px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
+              transition: 'all 0.2s ease-in-out'
+            }}
+            onClick={() => router.push("/")}
+            onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.4)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.3)'; }}
+          >
+            Return to Homepage
           </button>
         </div>
       </div>
