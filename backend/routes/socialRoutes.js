@@ -115,40 +115,53 @@ router.post("/instagram/:eventId", authMiddleware, adminMiddleware, async (req, 
       });
     }
 
-    const { postUrl } = await postToInstagram({
-      imageUrls,
-      caption,
-    });
-
-    // ✅ Save Instagram profile URL for UI
-    event.socialMedia.instagram.postUrl = postUrl ||
-      `https://www.instagram.com/${process.env.INSTAGRAM_USERNAME}/`;
-
-    event.socialMedia.instagram.posted = true;
-    event.socialMedia.instagram.postedAt = new Date();
-    event.socialMedia.instagram.status = "POSTED";
-
-    event.approvalTimeline.push({
-      action: "POSTED",
-      by: "ADMIN",
-      at: new Date(),
-    });
-
-    await event.save();
-
+    // ================= FIRE AND FORGET ================= 
     res.json({
       success: true,
-      message: "Event published to Instagram successfully",
+      message: "Publishing to Instagram started in the background",
     });
+
+    // Run actual publishing asynchronously
+    (async () => {
+      try {
+        const { postUrl } = await postToInstagram({
+          imageUrls,
+          caption,
+        });
+
+        // ✅ Save Instagram profile URL for UI
+        event.socialMedia.instagram.postUrl = postUrl ||
+          `https://www.instagram.com/${process.env.INSTAGRAM_USERNAME}/`;
+
+        event.socialMedia.instagram.posted = true;
+        event.socialMedia.instagram.postedAt = new Date();
+        event.socialMedia.instagram.status = "POSTED";
+
+        event.approvalTimeline.push({
+          action: "POSTED",
+          by: "ADMIN",
+          at: new Date(),
+        });
+
+        await event.save();
+        console.log("Instagram background publish success:", eventId);
+      } catch (bgError) {
+        console.error("Instagram background publish failed:", bgError.message);
+        // Optionally update event status to 'FAILED' here
+        event.socialMedia.instagram.status = "FAILED";
+        await event.save().catch(e => console.error(e));
+      }
+    })();
+
   } catch (error) {
     console.error(
-      "INSTAGRAM ERROR:",
-      error.response?.data || error.message
+      "INSTAGRAM ROUTE ERROR:",
+      error.message
     );
 
     res.status(500).json({
-      message: "Failed to publish to Instagram",
-      error: error.response?.data,
+      message: "Failed to initiate Instagram publishing",
+      error: error.message,
     });
   }
 });
@@ -259,37 +272,50 @@ router.post("/facebook/:eventId", authMiddleware, adminMiddleware, async (req, r
       });
     }
 
-    const { postUrl } = await postToFacebook({
-      imageUrls,
-      caption,
-    });
-
-    event.socialMedia.facebook.postUrl = postUrl;
-    event.socialMedia.facebook.posted = true;
-    event.socialMedia.facebook.postedAt = new Date();
-    event.socialMedia.facebook.status = "POSTED";
-
-    event.approvalTimeline.push({
-      action: "POSTED_FB",
-      by: "ADMIN",
-      at: new Date(),
-    });
-
-    await event.save();
-
+    // ================= FIRE AND FORGET ================= 
     res.json({
       success: true,
-      message: "Event published to Facebook successfully",
+      message: "Publishing to Facebook started in the background",
     });
+
+    // Run actual publishing asynchronously
+    (async () => {
+      try {
+        const { postUrl } = await postToFacebook({
+          imageUrls,
+          caption,
+        });
+
+        event.socialMedia.facebook.postUrl = postUrl;
+        event.socialMedia.facebook.posted = true;
+        event.socialMedia.facebook.postedAt = new Date();
+        event.socialMedia.facebook.status = "POSTED";
+
+        event.approvalTimeline.push({
+          action: "POSTED_FB",
+          by: "ADMIN",
+          at: new Date(),
+        });
+
+        await event.save();
+        console.log("Facebook background publish success:", eventId);
+      } catch (bgError) {
+        console.error("Facebook background publish failed:", bgError.message);
+        // Optionally update event status to 'FAILED' here
+        event.socialMedia.facebook.status = "FAILED";
+        await event.save().catch(e => console.error(e));
+      }
+    })();
+
   } catch (error) {
     console.error(
-      "FACEBOOK ERROR:",
-      error.response?.data || error.message
+      "FACEBOOK ROUTE ERROR:",
+      error.message
     );
 
     res.status(500).json({
-      message: "Failed to publish to Facebook",
-      error: error.response?.data,
+      message: "Failed to initiate Facebook publishing",
+      error: error.message,
     });
   }
 });
