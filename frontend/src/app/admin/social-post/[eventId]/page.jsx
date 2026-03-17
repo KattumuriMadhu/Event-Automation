@@ -118,6 +118,10 @@ export default function AdminSocialPostPage() {
             // If partially posted, we stay on page to allow posting to others
             setLoading(false);
             return;
+          } else if (res.status === 404) {
+            setEvent(null);
+            setLoading(false);
+            return;
           }
         }
 
@@ -125,6 +129,12 @@ export default function AdminSocialPostPage() {
           `${API_BASE_URL}/api/events/public/${eventId}`,
           { cache: 'no-store' }
         );
+
+        if (publicRes.status === 404) {
+          setEvent(null);
+          setLoading(false);
+          return;
+        }
 
         if (!publicRes.ok) throw new Error();
 
@@ -337,7 +347,40 @@ export default function AdminSocialPostPage() {
       </div>
     );
   }
-  if (!event) return <p className={styles.loading}>Event not found</p>;
+  if (!event) {
+    return (
+      <div className={styles.page}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
+          <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: '0 10px 20px rgba(100, 116, 139, 0.2)' }}>
+            <span style={{ fontSize: '36px' }}>🔍</span>
+          </div>
+          <h2 style={{ fontSize: '2rem', color: '#1e293b', marginBottom: '10px', fontWeight: '700' }}>Event Not Found</h2>
+          <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '30px', maxWidth: '400px', lineHeight: '1.6' }}>
+            We couldn't find the event you're looking for. It may have been removed or the link might be incorrect.
+          </p>
+          <button 
+            style={{
+              padding: '14px 32px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(37, 99, 235, 0.3)',
+              transition: 'all 0.2s ease-in-out'
+            }}
+            onClick={() => router.push("/")}
+            onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(37, 99, 235, 0.4)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 99, 235, 0.3)'; }}
+          >
+            Return to Homepage
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
