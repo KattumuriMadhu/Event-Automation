@@ -17,10 +17,7 @@ export async function postToInstagram({ imageUrls, caption }) {
   // Helper function to wait for media to be ready
   const waitForMedia = async (id) => {
     let retries = 0;
-    while (retries < 10) { // Increased to 10 retries (approx 30s)
-      retries++;
-      await new Promise(r => setTimeout(r, 3000));
-
+    while (retries < 15) { // 15 retries with shorter intervals
       try {
         const res = await axios.get(
           `${GRAPH_URL}/${id}?fields=status_code&access_token=${accessToken}`
@@ -28,8 +25,11 @@ export async function postToInstagram({ imageUrls, caption }) {
         if (res.data.status_code === "FINISHED") return true;
         if (res.data.status_code === "ERROR") throw new Error("Media processing failed");
       } catch (e) {
-        console.log(`Status check attempt ${retries} failed:`, e.message);
+        console.log(`Status check attempt ${retries + 1} failed:`, e.message);
       }
+
+      retries++;
+      await new Promise(r => setTimeout(r, 1500)); // Wait 1.5s instead of 3s
     }
     return false;
   };
