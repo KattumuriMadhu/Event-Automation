@@ -36,6 +36,8 @@ export default function Chatbot() {
     const isHidden =
         pathname.startsWith("/hod") ||
         pathname.startsWith("/admin/social-post") ||
+        pathname.startsWith("/admin/pending") ||
+        pathname.startsWith("/socialmedia-coordinator/approve") ||
         pathname === "/login" ||
         pathname === "/register" ||
         pathname.startsWith("/reset-password") ||
