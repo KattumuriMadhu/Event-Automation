@@ -22,7 +22,6 @@ export default function Chatbot() {
     };
 
     const [isMounted, setIsMounted] = useState(false);
-    const [isCoordinator, setIsCoordinator] = useState(false);
 
     useEffect(() => {
         setIsMounted(true);
@@ -31,16 +30,6 @@ export default function Chatbot() {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-
-    useEffect(() => {
-        if (!isMounted) return;
-        const user = getUser();
-        if (user?.role === "ADMIN") {
-            setIsCoordinator(true);
-        } else {
-            setIsCoordinator(false);
-        }
-    }, [pathname, isMounted]);
 
     if (!isMounted || !pathname) return null;
 
@@ -52,7 +41,7 @@ export default function Chatbot() {
         pathname.startsWith("/reset-password") ||
         pathname.startsWith("/create-password");
 
-    if (isHidden || isCoordinator) return null;
+    if (isHidden) return null;
 
     const handleSend = async () => {
         if (!input.trim() || loading) return;

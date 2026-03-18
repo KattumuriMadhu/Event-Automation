@@ -1,6 +1,7 @@
 import "./globals.scss";
 import { Toaster } from "react-hot-toast";
 import Header from "./components/Header";
+import Chatbot from "./components/Chatbot";
 
 
 
@@ -58,6 +59,7 @@ export default function RootLayout({ children }) {
             },
           }}
         />
+        <Chatbot />
       </body>
     </html>
   );
