@@ -20,7 +20,7 @@ export default function CoordinatorApprovalPage() {
   const [rejectReason, setRejectReason] = useState("");
 
   const [showRejectError, setShowRejectError] = useState(false);
-  const [activeImage, setActiveImage] = useState(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(null);
   const [serverError, setServerError] = useState(false);
 
   /* ================= FETCH EVENT (WITH POLLING) ================= */
@@ -92,17 +92,23 @@ export default function CoordinatorApprovalPage() {
     };
   }, [status, router]);
 
-  /* ================= CLOSE MODAL ON ESC KEY ================= */
+  /* ================= CLOSE/NAVIGATE MODAL ON KEYS ================= */
   useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === 'Escape' && activeImage) {
-        setActiveImage(null);
+    const handleKeydown = (e) => {
+      if (activeImageIndex === null || !event?.images?.length) return;
+      
+      if (e.key === 'Escape') {
+        setActiveImageIndex(null);
+      } else if (e.key === 'ArrowLeft') {
+        setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : event.images.length - 1));
+      } else if (e.key === 'ArrowRight') {
+        setActiveImageIndex((prev) => (prev < event.images.length - 1 ? prev + 1 : 0));
       }
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [activeImage]);
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [activeImageIndex, event]);
 
   /* ================= HANDLE ACTION ================= */
   const handleAction = async (action) => {
@@ -170,7 +176,7 @@ export default function CoordinatorApprovalPage() {
           <p style={{ color: '#64748b', fontSize: '1.1rem', marginBottom: '30px', maxWidth: '400px', lineHeight: '1.6' }}>
             We couldn't find the event you're looking for. It may have been removed or the link might be incorrect.
           </p>
-          <button 
+          <button
             style={{
               padding: '14px 32px',
               background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
@@ -241,177 +247,206 @@ export default function CoordinatorApprovalPage() {
         <div className={styles.container}>
           {!event.isExpired && (
             <div className={styles.content}>
-            <h1 className={styles.title}>{event.title}</h1>
+              <h1 className={styles.title}>{event.title}</h1>
 
-            <div className={styles.meta}>
-              <p><strong>Department:</strong> {event.department}</p>
-              <p><strong>Type:</strong> {event.type}</p>
-              <p><strong>Date{event.dates && event.dates.length > 1 ? 's' : ''}:</strong> {event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}</p>
-              <p><strong>Audience:</strong> {event.audience}</p>
-              <p><strong>Resource Person:</strong> {event.resourcePerson}</p>
-            </div>
-
-            {event.details && (
-              <div className={styles.details}>
-                <h3>Event Description</h3>
-                <p>{event.details}</p>
+              <div className={styles.meta}>
+                <p><strong>Department:</strong> {event.department}</p>
+                <p><strong>Type:</strong> {event.type}</p>
+                <p><strong>Date{event.dates && event.dates.length > 1 ? 's' : ''}:</strong> {event.dates && event.dates.length > 1 ? event.dates.map(d => new Date(d).toDateString()).join(', ') : new Date(event.date).toDateString()}</p>
+                <p><strong>Audience:</strong> {event.audience}</p>
+                <p><strong>Resource Person:</strong> {event.resourcePerson}</p>
               </div>
-            )}
 
-            {event.images?.length > 0 && (
-              <div className={styles.images}>
-                {event.images.map((img, i) => {
-                  const imageUrl = img.startsWith("http")
-                    ? img
-                    : `${API_BASE_URL}${img}`;
+              {event.details && (
+                <div className={styles.details}>
+                  <h3>Event Description</h3>
+                  <p>{event.details}</p>
+                </div>
+              )}
 
-                  return (
-                    <img
-                      key={i}
-                      src={imageUrl}
-                      alt="Event"
-                      loading="lazy"
-                      onClick={() => setActiveImage(imageUrl)}
-                    />
-                  );
-                })}
-              </div>
-            )}
+              {event.images?.length > 0 && (
+                <div className={styles.images}>
+                  {event.images.map((img, i) => {
+                    const imageUrl = img.startsWith("http")
+                      ? img
+                      : `${API_BASE_URL}${img}`;
 
-            {event.approvalStatus === "SENT" ? (
-              <div className={styles.actions}>
-                <button
-                  className={styles.approve}
-                  disabled={submitting}
-                  onClick={() => handleAction("approve")}
-                >
-                  {submitting ? "Processing…" : "Approve"}
-                </button>
+                    return (
+                      <img
+                        key={i}
+                        src={imageUrl}
+                        alt="Event"
+                        loading="lazy"
+                        onClick={() => setActiveImageIndex(i)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
 
-                <button
-                  className={styles.reject}
-                  disabled={submitting}
-                  onClick={() => setShowReject(true)}
-                >
-                  Reject
-                </button>
-              </div>
-            ) : (
-              <div className={styles.result} style={{ position: 'relative', height: 'auto', marginTop: '30px', padding: '0' }}>
-                <div className={styles.statusCard} style={{ margin: '0', maxWidth: '100%' }}>
-                  <div
-                    className={
-                      event.approvalStatus === "APPROVED"
-                        ? styles.successIcon
-                        : styles.failureIcon
-                    }
+              {event.approvalStatus === "SENT" ? (
+                <div className={styles.actions}>
+                  <button
+                    className={styles.approve}
+                    disabled={submitting}
+                    onClick={() => handleAction("approve")}
                   >
-                    {event.approvalStatus === "APPROVED" ? "✔" : "✖"}
+                    {submitting ? "Processing…" : "Approve"}
+                  </button>
+
+                  <button
+                    className={styles.reject}
+                    disabled={submitting}
+                    onClick={() => setShowReject(true)}
+                  >
+                    Reject
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.result} style={{ position: 'relative', height: 'auto', marginTop: '30px', padding: '0' }}>
+                  <div className={styles.statusCard} style={{ margin: '0', maxWidth: '100%' }}>
+                    <div
+                      className={
+                        event.approvalStatus === "APPROVED"
+                          ? styles.successIcon
+                          : styles.failureIcon
+                      }
+                    >
+                      {event.approvalStatus === "APPROVED" ? "✔" : "✖"}
+                    </div>
+                    <h2 className={styles.statusTitle} style={{ fontSize: '1.2rem' }}>
+                      This event is already {event.approvalStatus.toLowerCase()}
+                    </h2>
+                    <p className={styles.statusMessage} style={{ marginBottom: '0' }}>
+                      No further action is required.
+                    </p>
                   </div>
-                  <h2 className={styles.statusTitle} style={{ fontSize: '1.2rem' }}>
-                    This event is already {event.approvalStatus.toLowerCase()}
-                  </h2>
-                  <p className={styles.statusMessage} style={{ marginBottom: '0' }}>
-                    No further action is required.
-                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ================= EXPIRED LINK ================= */}
+          {event.isExpired && (
+            <div className={styles.result} style={{ position: 'relative', height: 'auto', marginTop: '30px', padding: '0', width: '100%' }}>
+              <div className={styles.statusCard} style={{ margin: '0', maxWidth: '100%', borderColor: '#f59e0b', backgroundColor: '#fffbeb' }}>
+                <div
+                  className={styles.failureIcon}
+                  style={{ backgroundColor: '#f59e0b', color: 'white' }}
+                >
+                  ⚠️
+                </div>
+                <h2 className={styles.statusTitle} style={{ fontSize: '1.2rem', color: '#b45309' }}>
+                  Link Expired
+                </h2>
+                <p className={styles.statusMessage} style={{ marginBottom: '0', color: '#92400e' }}>
+                  This approval link has expired (valid for 5 hours). Please contact the admin to resend the request.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* ================= VALIDATION ERROR ================= */}
+          {showRejectError && (
+            <div className={styles.validationOverlay}>
+              <div className={styles.validationCard}>
+                <div className={styles.validationIcon}>⚠️</div>
+                <h2>Rejection reason required</h2>
+                <p>
+                  Please enter a clear and valid reason before submitting the
+                  rejection.
+                </p>
+                <button
+                  className={styles.validationBtn}
+                  onClick={() => setShowRejectError(false)}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ================= REJECT MODAL ================= */}
+          {showReject && (
+            <div className={styles.overlay}>
+              <div className={styles.rejectCard}>
+                <h3>Reject Event</h3>
+
+                <textarea
+                  placeholder="Please provide a reason for rejection"
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                />
+
+                <div className={styles.rejectActions}>
+                  <button onClick={() => setShowReject(false)}>Cancel</button>
+                  <button
+                    className={styles.reject}
+                    onClick={() => handleAction("reject")}
+                  >
+                    Submit Rejection
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
-        )}
-
-        {/* ================= EXPIRED LINK ================= */}
-        {event.isExpired && (
-          <div className={styles.result} style={{ position: 'relative', height: 'auto', marginTop: '30px', padding: '0', width: '100%' }}>
-            <div className={styles.statusCard} style={{ margin: '0', maxWidth: '100%', borderColor: '#f59e0b', backgroundColor: '#fffbeb' }}>
-              <div
-                className={styles.failureIcon}
-                style={{ backgroundColor: '#f59e0b', color: 'white' }}
-              >
-                ⚠️
-              </div>
-              <h2 className={styles.statusTitle} style={{ fontSize: '1.2rem', color: '#b45309' }}>
-                Link Expired
-              </h2>
-              <p className={styles.statusMessage} style={{ marginBottom: '0', color: '#92400e' }}>
-                This approval link has expired (valid for 5 hours). Please contact the admin to resend the request.
-              </p>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ================= VALIDATION ERROR ================= */}
-        {showRejectError && (
-          <div className={styles.validationOverlay}>
-            <div className={styles.validationCard}>
-              <div className={styles.validationIcon}>⚠️</div>
-              <h2>Rejection reason required</h2>
-              <p>
-                Please enter a clear and valid reason before submitting the
-                rejection.
-              </p>
-              <button
-                className={styles.validationBtn}
-                onClick={() => setShowRejectError(false)}
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* ================= REJECT MODAL ================= */}
-        {showReject && (
-          <div className={styles.overlay}>
-            <div className={styles.rejectCard}>
-              <h3>Reject Event</h3>
-
-              <textarea
-                placeholder="Please provide a reason for rejection"
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-              />
-
-              <div className={styles.rejectActions}>
-                <button onClick={() => setShowReject(false)}>Cancel</button>
-                <button
-                  className={styles.reject}
-                  onClick={() => handleAction("reject")}
-                >
-                  Submit Rejection
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ================= IMAGE LIGHTBOX MODAL ================= */}
-        {activeImage && (
-          <div
-            className={styles.imageModal}
-            onClick={() => setActiveImage(null)}
-          >
-            <button
-              className={styles.closeButton}
-              onClick={() => setActiveImage(null)}
-              aria-label="Close"
-            >
-              ×
-            </button>
+          {/* ================= IMAGE LIGHTBOX MODAL ================= */}
+          {activeImageIndex !== null && event?.images && (
             <div
-              className={styles.imageWrapper}
-              onClick={(e) => e.stopPropagation()}
+              className={styles.imageModal}
+              onClick={() => setActiveImageIndex(null)}
             >
-              <img
-                src={activeImage}
-                alt="Full view"
-                className={styles.modalImage}
-              />
+              <button
+                className={styles.closeButton}
+                onClick={() => setActiveImageIndex(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+              
+              {event.images.length > 1 && (
+                <button 
+                  className={styles.navButton} 
+                  style={{ left: '20px' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : event.images.length - 1));
+                  }}
+                  aria-label="Previous image"
+                >
+                  &#10094;
+                </button>
+              )}
+
+              <div
+                className={styles.imageWrapper}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={event.images[activeImageIndex].startsWith("http") ? event.images[activeImageIndex] : `${API_BASE_URL}${event.images[activeImageIndex]}`}
+                  alt="Full view"
+                  className={styles.modalImage}
+                />
+              </div>
+
+              {event.images.length > 1 && (
+                <button 
+                  className={styles.navButton} 
+                  style={{ right: '20px' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveImageIndex((prev) => (prev < event.images.length - 1 ? prev + 1 : 0));
+                  }}
+                  aria-label="Next image"
+                >
+                  &#10095;
+                </button>
+              )}
             </div>
-          </div>
-        )}
-      </div>
-    )}
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -111,7 +111,8 @@ router.post("/register", async (req, res) => {
     await Otp.deleteMany({ email });
 
     // Send Approval Email to Coordinator
-    const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
+    const adminUser = await User.findOne({ role: "ADMIN" });
+    const coordinatorEmail = adminUser?.email || process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 465,
@@ -170,32 +171,33 @@ router.post("/login", async (req, res) => {
 
     // Special bypass for Coordinator via UI checkbox
     if (isCoordinator) {
-      const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
-      const isCoordinatorEmail = email.toLowerCase() === coordinatorEmail.toLowerCase() || email === "COORDINATOR";
+      const envCoordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
+      let user = await User.findOne({ role: "ADMIN" });
+      
+      const validEmails = [envCoordinatorEmail.toLowerCase(), "coordinator"];
+      if (user) validEmails.push(user.email.toLowerCase());
 
-      if (isCoordinatorEmail) {
-        let user = await User.findOne({ email: coordinatorEmail });
-
+      if (validEmails.includes(email.toLowerCase())) {
         // If coordinator exists, check their actual password (allows changed passwords to work!)
         if (user) {
           const match = await bcrypt.compare(password, user.password);
           if (!match) {
-             return res.status(400).json({ message: "Invalid coordinator credentials." });
+            return res.status(400).json({ message: "Invalid coordinator credentials." });
           }
-        } 
+        }
         // If coordinator doesn't exist yet, bootstrap them with the default "madhuk" password
         else {
           if (password === "madhuk") {
             const hashedPw = await bcrypt.hash("madhuk", 10);
             user = await User.create({
               name: "Coordinator",
-              email: coordinatorEmail,
+              email: envCoordinatorEmail,
               password: hashedPw,
               role: "ADMIN",
               status: "ACTIVE"
             });
           } else {
-             return res.status(400).json({ message: "Invalid coordinator credentials." });
+            return res.status(400).json({ message: "Invalid coordinator credentials." });
           }
         }
 
@@ -777,6 +779,37 @@ export default router;
 
 
 /* ================= COORDINATOR USER MANAGEMENT ================= */
+
+/* CHANGE COORDINATOR EMAIL */
+router.put("/admin/email", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ message: "Email and password are required" });
+
+    const adminUser = await User.findById(req.user.id);
+    if (!adminUser || adminUser.role !== "ADMIN") {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    const match = await bcrypt.compare(password, adminUser.password);
+    if (!match) {
+      return res.status(400).json({ message: "Incorrect password" });
+    }
+
+    const emailExists = await User.findOne({ email, _id: { $ne: req.user.id } });
+    if (emailExists) {
+      return res.status(400).json({ message: "Email already in use by another user" });
+    }
+
+    adminUser.email = email;
+    await adminUser.save();
+
+    res.json({ message: "Coordinator email updated successfully", email: email });
+  } catch (error) {
+    console.error("UPDATE ADMIN EMAIL ERROR:", error);
+    res.status(500).json({ message: "Failed to update email" });
+  }
+});
 
 /* GET ALL USERS (COORDINATOR ONLY) */
 router.get("/users", authMiddleware, adminMiddleware, async (req, res) => {

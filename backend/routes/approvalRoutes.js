@@ -14,7 +14,8 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
     const { eventId } = req.params;
 
     // Send to Social Media Coordinator directly
-    const coordinatorEmail = process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
+    const adminUser = await User.findOne({ role: "ADMIN" });
+    const coordinatorEmail = adminUser?.email || process.env.COORDINATOR_EMAIL || "madhu2000madhuk@gmail.com";
 
     if (!mongoose.Types.ObjectId.isValid(eventId)) {
       return res.status(400).json({ message: "Invalid event ID" });

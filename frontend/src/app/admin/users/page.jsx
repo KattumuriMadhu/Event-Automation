@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { getUser, getToken, logoutUser } from "@/utils/auth";
 import { API_BASE_URL } from "@/utils/config";
 import toast from "react-hot-toast";
+import { FaEnvelope, FaTimes, FaLock, FaUserShield } from "react-icons/fa";
 import styles from "./users.module.scss";
 
 export default function AdminUsersPage() {
@@ -17,6 +18,11 @@ export default function AdminUsersPage() {
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
 
+    const [coordinatorEmail, setCoordinatorEmail] = useState("");
+    const [emailPassword, setEmailPassword] = useState("");
+    const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+    const [showEmailModal, setShowEmailModal] = useState(false);
+
     useEffect(() => {
         const token = getToken();
         const currentUser = getUser();
@@ -25,6 +31,7 @@ export default function AdminUsersPage() {
             return;
         }
         setUser(currentUser);
+        setCoordinatorEmail(currentUser.email);
 
         const fetchUsers = async () => {
             try {
@@ -48,6 +55,46 @@ export default function AdminUsersPage() {
 
         fetchUsers();
     }, [router]);
+
+    const updateCoordinatorEmail = async () => {
+        if (!coordinatorEmail || !emailPassword) {
+            toast.error("Email and password are required");
+            return;
+        }
+        
+        setIsUpdatingEmail(true);
+        const token = getToken();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/auth/admin/email`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ email: coordinatorEmail, password: emailPassword })
+            });
+
+            if (response.ok) {
+                toast.success("Coordinator email updated successfully");
+                // Update local storage so session continues smoothly
+                const updatedUser = { ...user, email: coordinatorEmail };
+                setUser(updatedUser);
+                if (typeof localStorage !== "undefined") {
+                    localStorage.setItem("user", JSON.stringify(updatedUser));
+                }
+                setShowEmailModal(false);
+                setEmailPassword("");
+            } else {
+                const errData = await response.json();
+                toast.error(errData.message || "Failed to update email");
+            }
+        } catch (error) {
+            toast.error("Error updating email");
+        } finally {
+            setIsUpdatingEmail(false);
+        }
+    };
 
     const deleteUser = async () => {
         if (!confirmDeleteId) return;
@@ -167,10 +214,90 @@ export default function AdminUsersPage() {
 
             <header className={styles.header}>
                 <h1>Manage System Users</h1>
-                <button className={styles.backBtn} onClick={() => router.push("/events")}>
-                    View Events
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button 
+                        className={styles.backBtn} 
+                        style={{ background: "linear-gradient(135deg, #10b981 0%, #059669 100%)" }}
+                        onClick={() => setShowEmailModal(true)}
+                    >
+                        Change Email
+                    </button>
+                    <button className={styles.backBtn} onClick={() => router.push("/events")}>
+                        View Events
+                    </button>
+                </div>
             </header>
+
+            {/* EMAIL CHANGE MODAL */}
+            {showEmailModal && (
+                <div className={styles.overlay}>
+                    <div className={styles.emailModal}>
+                        <button 
+                            className={styles.closeIconBtn} 
+                            onClick={() => {
+                                setShowEmailModal(false);
+                                setEmailPassword("");
+                            }}
+                        >
+                            <FaTimes />
+                        </button>
+                        <div className={styles.modalIconWrapper}>
+                            <FaUserShield />
+                        </div>
+                        <h2>Update Coordinator Email</h2>
+                        <p>Ensure the new email is active as all authorization requests will be routed here securely.</p>
+                        
+                        <div className={styles.inputGroup}>
+                            <label>New Coordinator Email</label>
+                            <div style={{ position: 'relative' }}>
+                                <FaEnvelope style={{ position: 'absolute', top: '50%', left: '1rem', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                                <input 
+                                    type="email" 
+                                    value={coordinatorEmail} 
+                                    onChange={(e) => setCoordinatorEmail(e.target.value)} 
+                                    className={styles.premiumInput}
+                                    placeholder="admin@example.com"
+                                    style={{ paddingLeft: '2.5rem' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>Current Password</label>
+                            <div style={{ position: 'relative' }}>
+                                <FaLock style={{ position: 'absolute', top: '50%', left: '1rem', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                                <input 
+                                    type="password" 
+                                    value={emailPassword} 
+                                    onChange={(e) => setEmailPassword(e.target.value)} 
+                                    className={styles.premiumInput}
+                                    placeholder="••••••••"
+                                    style={{ paddingLeft: '2.5rem' }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.modalActions}>
+                            <button
+                                className={styles.cancelBtn}
+                                onClick={() => {
+                                    setShowEmailModal(false);
+                                    setEmailPassword("");
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className={styles.updateBtn} 
+                                onClick={updateCoordinatorEmail}
+                                disabled={isUpdatingEmail}
+                            >
+                                {isUpdatingEmail ? "Updating..." : "Confirm Update"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.card}>
                 <div className={styles.tableWrapper}>
@@ -207,7 +334,10 @@ export default function AdminUsersPage() {
                                                 onClick={() => toggleStatus(u._id, u.status)}
                                                 title={u.status === 'PENDING' ? '' : 'Click to interact/toggle block'}
                                             >
-                                                {u.status}
+                                                <span className={styles.statusText}>{u.status}</span>
+                                                <span className={styles.hoverText}>
+                                                    {u.status === 'ACTIVE' ? 'BLOCK' : u.status === 'BLOCKED' ? 'ACTIVE' : u.status}
+                                                </span>
                                             </span>
                                         </td>
                                         <td>
