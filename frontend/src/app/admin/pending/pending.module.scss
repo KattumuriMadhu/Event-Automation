@@ -229,49 +229,74 @@
 }
 
 .modal {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
     padding: 2.5rem;
-    border-radius: 1.25rem;
-    box-shadow: var(--shadow-lg);
-    max-width: 500px;
+    border-radius: 1.5rem;
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    max-width: 440px;
     width: 100%;
     animation: slideUpModal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
 
     h2 {
-        margin: 0 0 1.25rem;
+        margin: 0 0 0.5rem;
         font-size: 1.5rem;
         font-weight: 700;
         color: var(--color-text-primary);
     }
 }
 
+.modalIconWrapper {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-dark) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+}
+
 @keyframes slideUpModal {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(40px) scale(0.95);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
 .reasonInput {
     width: 100%;
+    height: 120px;
     padding: 1rem;
     margin-bottom: 1.5rem;
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+    border-radius: 0.75rem;
     font-family: inherit;
-    font-size: 0.95rem;
-    resize: vertical;
+    font-size: 1rem;
+    background: #f8fafc;
+    color: var(--color-text-primary);
+    resize: none;
     outline: none;
     transition: var(--transition);
 
+    &::placeholder {
+        color: #94a3b8;
+    }
+
     &:focus {
+        background: white;
         border-color: var(--color-danger);
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
     }
 }
 
@@ -283,9 +308,10 @@
 
 .cancelBtn,
 .confirmRejectBtn {
+    flex: 1;
     min-height: 44px;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--border-radius);
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.75rem;
     border: none;
     font-weight: 600;
     font-size: 0.95rem;
@@ -303,17 +329,20 @@
 }
 
 .confirmRejectBtn {
-    background: var(--color-danger);
+    flex: 2;
+    background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-dark) 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
 
     &:hover:not(:disabled) {
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
     }
 
     &:disabled {
-        opacity: 0.6;
+        opacity: 0.7;
         cursor: not-allowed;
+        transform: none;
     }
 }
 

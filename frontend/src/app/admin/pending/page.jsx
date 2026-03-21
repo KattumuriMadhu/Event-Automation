@@ -260,8 +260,11 @@ export default function PendingApprovalsPage() {
             {rejectingId && (
                 <div className={styles.overlay}>
                     <div className={styles.modal}>
+                        <div className={styles.modalIconWrapper}>
+                            ✕
+                        </div>
                         <h2>Reject Event</h2>
-                        <p style={{ color: '#64748b', marginBottom: '1rem', fontSize: '0.95rem' }}>
+                        <p style={{ color: '#64748b', marginBottom: '1.5rem', fontSize: '0.95rem' }}>
                             Please provide a reason for rejection. This will be sent directly to the event submitter.
                         </p>
 
@@ -271,6 +274,12 @@ export default function PendingApprovalsPage() {
                             placeholder="e.g., The event details are incomplete. Please add a resource person..."
                             value={rejectReason}
                             onChange={(e) => setRejectReason(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    submitReject();
+                                }
+                            }}
                             autoFocus
                         />
 

@@ -122,22 +122,36 @@ export default function CoordinatorApprovalPage() {
 
     setSubmitting(true);
 
-    await fetch(`${API_BASE_URL}/api/approval/${action}/${id}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body:
-        action === "reject"
-          ? JSON.stringify({ reason: rejectReason })
-          : null,
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/approval/${action}/${id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body:
+          action === "reject"
+            ? JSON.stringify({ reason: rejectReason })
+            : null,
+      });
 
-    setShowReject(false);
-    setRejectReason("");
-    setStatus(action === "approve" ? "APPROVED" : "REJECTED");
-    setSubmitting(false);
+      if (!response.ok) {
+        const errData = await response.json();
+        console.error("Action failed:", errData);
+        alert(`Failed to ${action} event. Please try again.`);
+        setSubmitting(false);
+        return;
+      }
 
-    if (action === "approve") {
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      setShowReject(false);
+      setRejectReason("");
+      setStatus(action === "approve" ? "APPROVED" : "REJECTED");
+
+      if (action === "approve") {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+      }
+    } catch (error) {
+      console.error("Error during action:", error);
+      alert(`Network error during ${action}. Please try again.`);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -370,21 +384,33 @@ export default function CoordinatorApprovalPage() {
           {showReject && (
             <div className={styles.overlay}>
               <div className={styles.rejectCard}>
+                <div className={styles.modalIconWrapper}>
+                   ✕
+                </div>
                 <h3>Reject Event</h3>
+                <p>Please provide a reason for rejection. This will be sent directly to the event submitter.</p>
 
                 <textarea
-                  placeholder="Please provide a reason for rejection"
+                  className={styles.premiumTextarea}
+                  placeholder="e.g., The event details are incomplete..."
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleAction("reject");
+                    }
+                  }}
                 />
 
                 <div className={styles.rejectActions}>
-                  <button onClick={() => setShowReject(false)}>Cancel</button>
+                  <button className={styles.cancelBtn} onClick={() => setShowReject(false)}>Cancel</button>
                   <button
-                    className={styles.reject}
+                    className={styles.submitRejectBtn}
                     onClick={() => handleAction("reject")}
+                    disabled={submitting}
                   >
-                    Submit Rejection
+                    {submitting ? "Submitting..." : "Submit Rejection"}
                   </button>
                 </div>
               </div>

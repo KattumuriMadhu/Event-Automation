@@ -61,7 +61,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
       },
     });
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
       to: coordinatorEmail,
       subject: `Approval Required: ${event.title}`,
@@ -277,7 +277,7 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
 </body>
 </html>
 `,
-    });
+    }).catch(error => console.error("Error sending approval email asynchronously:", error));
 
     res.json({ message: "Approval email sent successfully" });
   } catch (error) {
@@ -369,7 +369,7 @@ router.post("/approve/:id", async (req, res) => {
     // Send email to original submitter or fallback to admin
     const recipientEmail = event.submittedByEmail || process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
       to: recipientEmail,
       subject: `✅ Event Approved: ${event.title}`,
@@ -691,7 +691,7 @@ router.post("/approve/:id", async (req, res) => {
 </body>
 </html>
 `,
-    });
+    }).catch(error => console.error("Error sending approved email asynchronously:", error));
 
     res.json({ message: "Event approved successfully" });
   } catch (error) {
@@ -733,7 +733,7 @@ router.post("/reject/:id", async (req, res) => {
 
     const rejectRecipient = event.submittedByEmail || process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
       to: rejectRecipient,
       subject: `❌ Event Rejected: ${event.title}`,
@@ -869,10 +869,11 @@ router.post("/reject/:id", async (req, res) => {
 </body>
 </html>
       `,
-    });
+    }).catch(error => console.error("Error sending rejected email asynchronously:", error));
 
     res.json({ message: "Event rejected successfully" });
-  } catch {
+  } catch (error) {
+    console.error("REJECT ROUTE ERROR:", error);
     res.status(500).json({ message: "Rejection failed" });
   }
 });

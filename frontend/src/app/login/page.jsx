@@ -1,8 +1,8 @@
 "use client";
 
-import { loginUser } from "@/utils/auth";
+import { loginUser, logoutUser } from "@/utils/auth";
 import { API_BASE_URL } from "@/utils/config";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,6 +11,11 @@ import styles from "./login.module.scss";
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  /* ================= AUTO LOGOUT ON VISIT ================= */
+  useEffect(() => {
+    logoutUser(); // If they arrive at /login, explicitly wipe their session
+  }, []);
 
   /* New State for Logic */
   const [email, setEmail] = useState("");
