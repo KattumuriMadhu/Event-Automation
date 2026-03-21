@@ -128,7 +128,7 @@ Don't miss this opportunity to learn and grow! 🎓
   return raw;
 }
 
-export async function chatWithAssistant(message) {
+export async function chatWithAssistant(messages, chatContext = {}) {
   const apiKey = getRotatedKey();
   if (!apiKey) {
     console.error("❌ OPENAI_API_KEY is missing");
@@ -137,22 +137,33 @@ export async function chatWithAssistant(message) {
 
   const openai = new OpenAI({ apiKey });
 
+  const user = chatContext.user || {};
+  const pathname = chatContext.pathname || "unknown";
+
+  const systemContent = `You are a helpful assistant for the "Event Automation System" at NSRIT.
+You are currently talking to ${user.name || user.email || 'a user'} who has the role of ${user.role || 'Guest'}.
+They are currently viewing the page: ${pathname}. Use this context to personalize your response.
+
+You can answer any topic the user asks about.
+HOWEVER, if the user asks about the system, you are an expert in:
+- Managing events (creating, editing, deleting)
+- Approval workflows (HOD approval, rejection)
+- Social media automation (Instagram posting, scheduling)
+- User management (Admin, Provider roles)`;
+
+  // Combine the dynamic system prompt with the history of messages from the frontend
+  const apiMessages = [
+    {
+      role: "system",
+      content: systemContent,
+    },
+    ...messages
+  ];
+
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     temperature: 0.7,
-    messages: [
-      {
-        role: "system",
-        content: `You are a helpful assistant for the "Event Automation System" at NSRIT.
-        You can answer any topic the user asks about.
-        HOWEVER, if the user asks about the system, you are an expert in:
-        - Managing events (creating, editing, deleting)
-        - Approval workflows (HOD approval, rejection)
-        - Social media automation (Instagram posting, scheduling)
-        - User management (Admin, Provider roles)`,
-      },
-      { role: "user", content: message },
-    ],
+    messages: apiMessages,
   });
 
   return response.choices[0].message.content.trim();

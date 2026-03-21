@@ -6,12 +6,18 @@ const router = express.Router();
 
 router.post("/", authMiddleware, async (req, res) => {
     try {
-        const { message } = req.body;
-        if (!message) {
-            return res.status(400).json({ message: "Message is required" });
+        const { messages, context } = req.body;
+        if (!messages || !Array.isArray(messages)) {
+            return res.status(400).json({ message: "Messages array is required" });
         }
 
-        const reply = await chatWithAssistant(message);
+        // Pass both the messages array and the context (including the authenticated user)
+        const chatContext = {
+            user: req.user,
+            pathname: context?.pathname || "Unknown Page"
+        };
+
+        const reply = await chatWithAssistant(messages, chatContext);
         res.json({ reply });
     } catch (error) {
         console.error("CHAT ERROR:", error);

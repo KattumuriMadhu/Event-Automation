@@ -9,9 +9,7 @@ export default function Chatbot() {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
-    const [messages, setMessages] = useState([
-        { role: "assistant", content: "Hi! How can I help you with the Event System today?" }
-    ]);
+    const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
@@ -23,9 +21,44 @@ export default function Chatbot() {
 
     const [isMounted, setIsMounted] = useState(false);
 
+    const [userRole, setUserRole] = useState("");
+
     useEffect(() => {
         setIsMounted(true);
-    }, []);
+
+        const updateUserContext = () => {
+            const currentUser = getUser();
+            let roleStr = "";
+            let greeting = "Hi! How can I help you with the Event System today?";
+            
+            if (currentUser) {
+                if (currentUser.role === "ADMIN") {
+                    roleStr = "Coordinator";
+                    greeting = "Hi Coordinator! How can I assist you with approvals or publishing today?";
+                } else {
+                    roleStr = currentUser.name ? currentUser.name.split(" ")[0] : "there";
+                    greeting = `Hi ${roleStr}! Ready to submit or manage your events?`;
+                }
+            }
+            
+            setUserRole(roleStr);
+            setMessages((prev) => {
+                // Only replace the initial greeting if there are no other messages
+                if (prev.length <= 1) {
+                    return [{ role: "assistant", content: greeting }];
+                }
+                return prev;
+            });
+        };
+
+        // Initial check
+        updateUserContext();
+
+        // Check on auth updates
+        window.addEventListener("auth-change", updateUserContext);
+        return () => window.removeEventListener("auth-change", updateUserContext);
+
+    }, [pathname]);
 
     useEffect(() => {
         scrollToBottom();
@@ -50,7 +83,11 @@ export default function Chatbot() {
 
         const userMsg = input;
         setInput("");
-        setMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+        
+        // Remove the hardcoded initial greeting from history sent to OpenAI to save tokens, or leave it. We'll leave it for context.
+        const newMessages = [...messages, { role: "user", content: userMsg }];
+        setMessages(newMessages);
+        
         setLoading(true);
 
         try {
@@ -61,7 +98,10 @@ export default function Chatbot() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ message: userMsg }),
+                body: JSON.stringify({ 
+                    messages: newMessages, 
+                    context: { pathname } 
+                }),
             });
 
             if (!res.ok) throw new Error("Failed to fetch");
@@ -114,7 +154,7 @@ export default function Chatbot() {
                     transition: "all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)", // Cute bounce effect
                     borderBottomRightRadius: "4px"
                 }}>
-                    👋 Hi! I'm Jarvis
+                    👋 Hi {userRole ? userRole : 'there'}! I'm Jarvis
                 </div>
 
                 <button
