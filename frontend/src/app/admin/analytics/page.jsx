@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, getToken } from "@/utils/auth";
+import { FaExclamationTriangle } from "react-icons/fa";
+import ServerError from "@/app/components/ServerError";
+import { getUser, getToken, logoutUser } from "@/utils/auth";
 import { API_BASE_URL } from "@/utils/config";
 import CustomDatePicker from "@/app/components/CustomDatePicker";
 import { LayoutDashboard, Clock, CheckCircle, XCircle, ArrowLeft, Calendar as CalendarIcon, ChevronLeft, ChevronRight, ChevronDown, Download } from "lucide-react";
@@ -100,6 +102,10 @@ export default function AnalyticsPage() {
         // User requested to ONLY show published events in Analytics (charts, exports, calendar)
         const publishedEvents = data.filter(e => e.socialMedia?.instagram?.posted || e.socialMedia?.facebook?.posted);
         setEvents(publishedEvents);
+      } else if (response.status === 401 || response.status === 403) {
+        logoutUser();
+        router.push("/login");
+        return;
       } else {
         setServerError(true);
       }
@@ -127,31 +133,7 @@ export default function AnalyticsPage() {
     return <div className={styles.loaderArea}>Loading Dashboard Analytics...</div>;
   }
 
-  if (serverError) {
-    return (
-      <div className={styles.page}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', textAlign: "center", padding: "50px" }}>
-          <h2>Cannot Connect to Server</h2>
-          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
-          <button
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              background: '#8b5cf6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
-            onClick={() => window.location.reload()}
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (serverError) return <ServerError />;
 
   // Basic Stats
   const totalCount = events.length;

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.scss";
 import { logoutUser, getUser, getToken } from "@/utils/auth";
 import Loader from "../components/Loader";
+import ServerError from "@/app/components/ServerError";
 
 import loadingAnimation from "../lottie/loading.json";
 
@@ -407,32 +408,7 @@ export default function Dashboard() {
     return <div style={{ position: 'fixed', inset: 0, background: 'white', zIndex: 2147483647 }} />;
   }
 
-  if (serverError) {
-    return (
-      <div className={styles.page}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
-          <FaExclamationTriangle size={48} color="#ef4444" style={{ marginBottom: '1rem' }} />
-          <h2>Cannot Connect to Server</h2>
-          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
-          <button
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              background: '#8b5cf6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
-            onClick={() => window.location.reload()}
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (serverError) return <ServerError />;
 
   return (
     <div className={styles.page}>

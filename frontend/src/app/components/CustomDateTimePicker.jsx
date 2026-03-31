@@ -106,12 +106,15 @@ export default function CustomDateTimePicker({ value, onChange }) {
         const finalDate = new Date(newDate);
         finalDate.setHours(h, newMinute, 0, 0);
 
-        // Adjust for timezone offset so ISO string is correct for local time
-        const offset = finalDate.getTimezoneOffset();
-        const correctDate = new Date(finalDate.getTime() - (offset * 60 * 1000));
+        // Format local date parts to avoid DST shift bugs using string padding
+        const yyyy = finalDate.getFullYear();
+        const mm = String(finalDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(finalDate.getDate()).padStart(2, '0');
+        const hh = String(finalDate.getHours()).padStart(2, '0');
+        const min = String(finalDate.getMinutes()).padStart(2, '0');
 
         // Return ISO string format: YYYY-MM-DDTHH:mm
-        onChange({ target: { value: correctDate.toISOString().slice(0, 16) } });
+        onChange({ target: { value: `${yyyy}-${mm}-${dd}T${hh}:${min}` } });
     };
 
     const handleDateClick = (day) => {

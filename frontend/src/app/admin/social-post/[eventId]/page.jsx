@@ -7,9 +7,10 @@ import styles from "./socialPost.module.scss";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 import CustomDateTimePicker from "@/app/components/CustomDateTimePicker";
-import { FaInstagram, FaFacebook } from "react-icons/fa";
+import { FaInstagram, FaFacebook, FaExclamationTriangle } from "react-icons/fa";
 import { Calendar } from "lucide-react";
 import { API_BASE_URL } from "@/utils/config";
+import ServerError from "@/app/components/ServerError";
 
 export default function AdminSocialPostPage() {
   const { eventId } = useParams();
@@ -321,32 +322,7 @@ export default function AdminSocialPostPage() {
 
   /* ================= UI STATES ================= */
   if (loading) return <p className={styles.loading}>Loading…</p>;
-  if (serverError) {
-    return (
-      <div className={styles.page}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
-          <h2 style={{ color: '#ef4444', fontSize: '2rem', marginBottom: '1rem' }}>⚠</h2>
-          <h2>Cannot Connect to Server</h2>
-          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
-          <button
-            style={{
-              marginTop: '20px',
-              padding: '10px 20px',
-              background: '#8b5cf6',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: '500'
-            }}
-            onClick={() => window.location.reload()}
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (serverError) return <ServerError />;
   if (!event) {
     return (
       <div className={styles.page}>

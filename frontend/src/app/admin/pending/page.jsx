@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, getToken } from "@/utils/auth";
+import { getUser, getToken, logoutUser } from "@/utils/auth";
 import { API_BASE_URL } from "@/utils/config";
 import toast from "react-hot-toast";
 import styles from "./pending.module.scss";
 import ImageSlider from "@/app/components/ImageSlider";
+import { FaCheck, FaTimes, FaExternalLinkAlt, FaExclamationTriangle } from "react-icons/fa";
+import ServerError from "@/app/components/ServerError";
 import confetti from "canvas-confetti";
 
 export default function PendingApprovalsPage() {
@@ -53,6 +55,10 @@ export default function PendingApprovalsPage() {
                 // Filter only those that are 'SENT'
                 const pending = data.filter((e) => e.approvalStatus === "SENT");
                 setPendingEvents(pending);
+            } else if (response.status === 401 || response.status === 403) {
+                logoutUser();
+                router.push("/login");
+                return;
             } else {
                 setServerError(true);
                 toast.error("Failed to load events");
@@ -145,32 +151,7 @@ export default function PendingApprovalsPage() {
         return <div className={styles.loaderArea}>Loading pending approvals...</div>;
     }
 
-    if (serverError) {
-        return (
-            <div className={styles.page}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
-                    <h2 style={{ color: '#ef4444', fontSize: '2rem', marginBottom: '1rem' }}>⚠</h2>
-                    <h2>Cannot Connect to Server</h2>
-                    <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
-                    <button
-                        style={{
-                            marginTop: '20px',
-                            padding: '10px 20px',
-                            background: '#8b5cf6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontWeight: '500'
-                        }}
-                        onClick={() => window.location.reload()}
-                    >
-                        Retry Connection
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    if (serverError) return <ServerError />;
 
     return (
         <div className={styles.page}>

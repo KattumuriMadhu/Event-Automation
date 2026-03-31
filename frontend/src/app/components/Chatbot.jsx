@@ -123,7 +123,7 @@ export default function Chatbot() {
     };
 
     return (
-        <>
+        <div id="global-chatbot-wrapper">
             {/* Floating Button with Pulse Effect */}
             <div
                 style={{
@@ -420,6 +420,6 @@ export default function Chatbot() {
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }

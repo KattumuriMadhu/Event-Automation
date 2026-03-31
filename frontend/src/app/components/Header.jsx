@@ -61,7 +61,7 @@ export default function Header() {
                 }
             `}</style>
 
-            <header style={styles.header}>
+            <header id="global-header" style={styles.header}>
                 <div style={styles.logoSection}>
                     <img src="/nsrit-logo.jpeg" alt="NSRIT Logo" style={styles.logo} />
                     {/* <h1 style={styles.title}>Nadimpalli Satya Narayana Raju Institute of Technology</h1> */}
@@ -87,7 +87,50 @@ export default function Header() {
                                         <span style={{ fontSize: '18px', WebkitTextFillColor: 'initial' }}>👑</span> Coordinator
                                     </div>
                                 ) : (
-                                    <span style={styles.userName}>{user.email || "Admin"}</span>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '12px'
+                                    }}>
+                                        <div style={{
+                                            width: '38px',
+                                            height: '38px',
+                                            borderRadius: '50%',
+                                            background: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)',
+                                            border: '2px solid #ffffff',
+                                            boxShadow: '0 3px 10px rgba(2, 132, 199, 0.15)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#0284c7',
+                                            fontSize: '16px',
+                                            fontWeight: '800'
+                                        }}>
+                                            {(user.name || user.email || "U").charAt(0).toUpperCase()}
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                                            <span style={{
+                                                color: '#64748b',
+                                                fontSize: '11px',
+                                                fontWeight: '600',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '1px',
+                                                lineHeight: '1',
+                                                marginBottom: '4px'
+                                            }}>
+                                                Welcome back
+                                            </span>
+                                            <span style={{
+                                                color: '#0f172a',
+                                                fontWeight: '800',
+                                                fontSize: '15px',
+                                                letterSpacing: '-0.3px',
+                                                lineHeight: '1'
+                                            }}>
+                                                {user.name || user.email || "User"}
+                                            </span>
+                                        </div>
+                                    </div>
                                 )}
                                 <button
                                     style={styles.logoutBtn}

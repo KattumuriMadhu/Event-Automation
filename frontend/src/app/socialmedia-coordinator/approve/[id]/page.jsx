@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import styles from "./approve.module.scss";
 import confetti from "canvas-confetti";
 import { API_BASE_URL } from "@/utils/config";
+import { FaExclamationTriangle } from "react-icons/fa";
+import ServerError from "@/app/components/ServerError";
 
 export default function CoordinatorApprovalPage() {
   const { id } = useParams();
@@ -96,7 +98,7 @@ export default function CoordinatorApprovalPage() {
   useEffect(() => {
     const handleKeydown = (e) => {
       if (activeImageIndex === null || !event?.images?.length) return;
-      
+
       if (e.key === 'Escape') {
         setActiveImageIndex(null);
       } else if (e.key === 'ArrowLeft') {
@@ -165,19 +167,7 @@ export default function CoordinatorApprovalPage() {
     );
   }
 
-  if (serverError) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.container}>
-          <h2>Cannot Connect to Server</h2>
-          <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
-          <button className={styles.approve} style={{ marginTop: '20px' }} onClick={() => window.location.reload()}>
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (serverError) return <ServerError />;
 
   if (!event) {
     return (
@@ -385,7 +375,7 @@ export default function CoordinatorApprovalPage() {
             <div className={styles.overlay}>
               <div className={styles.rejectCard}>
                 <div className={styles.modalIconWrapper}>
-                   ✕
+                  ✕
                 </div>
                 <h3>Reject Event</h3>
                 <p>Please provide a reason for rejection. This will be sent directly to the event submitter.</p>
@@ -430,10 +420,10 @@ export default function CoordinatorApprovalPage() {
               >
                 ×
               </button>
-              
+
               {event.images.length > 1 && (
-                <button 
-                  className={styles.navButton} 
+                <button
+                  className={styles.navButton}
                   style={{ left: '20px' }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -457,8 +447,8 @@ export default function CoordinatorApprovalPage() {
               </div>
 
               {event.images.length > 1 && (
-                <button 
-                  className={styles.navButton} 
+                <button
+                  className={styles.navButton}
                   style={{ right: '20px' }}
                   onClick={(e) => {
                     e.stopPropagation();

@@ -61,7 +61,8 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
       },
     });
 
-    transporter.sendMail({
+    try {
+      await transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
       to: coordinatorEmail,
       subject: `Approval Required: ${event.title}`,
@@ -277,7 +278,10 @@ router.post("/send/:eventId", authMiddleware, async (req, res) => {
 </body>
 </html>
 `,
-    }).catch(error => console.error("Error sending approval email asynchronously:", error));
+      });
+    } catch (error) {
+      console.error("Error sending approval email:", error);
+    }
 
     res.json({ message: "Approval email sent successfully" });
   } catch (error) {
@@ -353,6 +357,9 @@ router.post("/approve/:id", async (req, res) => {
         process.env.JWT_SECRET,
         { expiresIn: "7d" } // Token valid for 7 days for email links
       );
+    } else {
+      console.error("Critical Error: No ADMIN user found in the database. Unable to generate magic link.");
+      return res.status(500).json({ message: "No ADMIN configured in the system. Cannot generate publishing token." });
     }
 
     /* ================= EMAIL TO ADMIN ================= */
@@ -369,7 +376,8 @@ router.post("/approve/:id", async (req, res) => {
     // Send email to original submitter or fallback to admin
     const recipientEmail = event.submittedByEmail || process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
 
-    transporter.sendMail({
+    try {
+      await transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
       to: recipientEmail,
       subject: `✅ Event Approved: ${event.title}`,
@@ -691,7 +699,10 @@ router.post("/approve/:id", async (req, res) => {
 </body>
 </html>
 `,
-    }).catch(error => console.error("Error sending approved email asynchronously:", error));
+      });
+    } catch (error) {
+      console.error("Error sending approved email:", error);
+    }
 
     res.json({ message: "Event approved successfully" });
   } catch (error) {
@@ -733,7 +744,8 @@ router.post("/reject/:id", async (req, res) => {
 
     const rejectRecipient = event.submittedByEmail || process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
 
-    transporter.sendMail({
+    try {
+      await transporter.sendMail({
       from: `"Event Automation System" <${process.env.EMAIL_USER}>`,
       to: rejectRecipient,
       subject: `❌ Event Rejected: ${event.title}`,
@@ -869,7 +881,10 @@ router.post("/reject/:id", async (req, res) => {
 </body>
 </html>
       `,
-    }).catch(error => console.error("Error sending rejected email asynchronously:", error));
+      });
+    } catch (error) {
+      console.error("Error sending rejected email:", error);
+    }
 
     res.json({ message: "Event rejected successfully" });
   } catch (error) {

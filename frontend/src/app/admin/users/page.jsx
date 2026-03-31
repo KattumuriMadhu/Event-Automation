@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { getUser, getToken, logoutUser } from "@/utils/auth";
 import { API_BASE_URL } from "@/utils/config";
 import toast from "react-hot-toast";
-import { FaEnvelope, FaTimes, FaLock, FaUserShield } from "react-icons/fa";
+import { FaEnvelope, FaTimes, FaLock, FaUserShield, FaExclamationTriangle } from "react-icons/fa";
+import ServerError from "@/app/components/ServerError";
 import styles from "./users.module.scss";
 
 export default function AdminUsersPage() {
@@ -43,6 +44,10 @@ export default function AdminUsersPage() {
                 if (response.ok) {
                     const data = await response.json();
                     setUsersList(data);
+                } else if (response.status === 401 || response.status === 403) {
+                    logoutUser();
+                    router.push("/login");
+                    return;
                 } else {
                     setServerError(true);
                 }
@@ -156,32 +161,7 @@ export default function AdminUsersPage() {
         return <div className={styles.loaderArea}>Loading users...</div>;
     }
 
-    if (serverError) {
-        return (
-            <div className={styles.page}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh', textAlign: "center", padding: "50px" }}>
-                    <h2 style={{ color: '#ef4444', fontSize: '2rem', marginBottom: '1rem' }}>⚠</h2>
-                    <h2>Cannot Connect to Server</h2>
-                    <p style={{ marginTop: '10px', color: '#64748b' }}>Please check if the backend server is running and try again.</p>
-                    <button
-                        style={{
-                            marginTop: '20px',
-                            padding: '10px 20px',
-                            background: '#8b5cf6',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            fontWeight: '500'
-                        }}
-                        onClick={() => window.location.reload()}
-                    >
-                        Retry Connection
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    if (serverError) return <ServerError />;
 
     return (
         <div className={styles.page}>
